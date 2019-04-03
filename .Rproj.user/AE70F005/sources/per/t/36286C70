@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1554302198298.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3207087676",
+    "id" : "36286C70",
+    "lastKnownWriteTime" : 1554316163,
+    "last_content_update" : 1554316163578,
+    "path" : "~/Documents/brkga/src/nl_brkga.cpp",
+    "project_path" : "src/nl_brkga.cpp",
+    "properties" : {
+        "cursorPosition" : "67,44",
+        "scrollLine" : "55"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "cpp"
+}

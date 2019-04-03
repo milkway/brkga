@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1554302364011.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3693181578",
+    "id" : "7E7E981",
+    "lastKnownWriteTime" : 1554317749,
+    "last_content_update" : 1554317749477,
+    "path" : "~/Documents/brkga/inst/extdata/RandomCodes.R",
+    "project_path" : "inst/extdata/RandomCodes.R",
+    "properties" : {
+        "cursorPosition" : "41,0",
+        "scrollLine" : "20",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

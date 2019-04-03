@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1554304248056.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3165265728",
+    "id" : "74F40EC5",
+    "lastKnownWriteTime" : 1554315411,
+    "last_content_update" : 1554315411652,
+    "path" : "~/Documents/brkga/src/nlDecoder.h",
+    "project_path" : "src/nlDecoder.h",
+    "properties" : {
+        "cursorPosition" : "62,66",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "h"
+}

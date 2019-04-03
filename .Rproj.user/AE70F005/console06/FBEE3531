@@ -1,0 +1,12 @@
+]0;/home/leite/Documents/brkga]0;leite@Asimov: ~/Documents/brkga[01;32mleite@Asimov[00m:[01;34m~/Documents/brkga[00m$ ldconfig -p | grep af[K[Kaf
+	lib[01;31m[Kaf[m[Kopencl.so.3 (libc6,x86-64) => /opt/arrayfire/lib64/lib[01;31m[Kaf[m[Kopencl.so.3
+	lib[01;31m[Kaf[m[Kopencl.so (libc6,x86-64) => /opt/arrayfire/lib64/lib[01;31m[Kaf[m[Kopencl.so
+	lib[01;31m[Kaf[m[Kcuda.so.3 (libc6,x86-64) => /opt/arrayfire/lib64/lib[01;31m[Kaf[m[Kcuda.so.3
+	lib[01;31m[Kaf[m[Kcuda.so (libc6,x86-64) => /opt/arrayfire/lib64/lib[01;31m[Kaf[m[Kcuda.so
+	lib[01;31m[Kaf[m[Kcpu.so.3 (libc6,x86-64) => /opt/arrayfire/lib64/lib[01;31m[Kaf[m[Kcpu.so.3
+	lib[01;31m[Kaf[m[Kcpu.so.3 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/lib[01;31m[Kaf[m[Kcpu.so.3
+	lib[01;31m[Kaf[m[Kcpu.so (libc6,x86-64) => /opt/arrayfire/lib64/lib[01;31m[Kaf[m[Kcpu.so
+	lib[01;31m[Kaf[m[Kcpu.so (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/lib[01;31m[Kaf[m[Kcpu.so
+	lib[01;31m[Kaf[m[K.so.3 (libc6,x86-64) => /opt/arrayfire/lib64/lib[01;31m[Kaf[m[K.so.3
+	lib[01;31m[Kaf[m[K.so (libc6,x86-64) => /opt/arrayfire/lib64/lib[01;31m[Kaf[m[K.so
+]0;/home/leite/Documents/brkga]0;leite@Asimov: ~/Documents/brkga[01;32mleite@Asimov[00m:[01;34m~/Documents/brkga[00m$ 
