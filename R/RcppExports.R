@@ -5,8 +5,8 @@ tsp_brkga <- function(instanceFile) {
     .Call(`_brkga_tsp_brkga`, instanceFile)
 }
 
-nl_brkga <- function(func_, lowerLimit, upperLimit, p = 100L, pe = 0.10, pm = 0.10, rhoe = 0.70, K = 3L, MAXT = 1L, verbose = FALSE, data = NULL, rngSeed = 0L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 1000L) {
-    .Call(`_brkga_nl_brkga`, func_, lowerLimit, upperLimit, p, pe, pm, rhoe, K, MAXT, verbose, data, rngSeed, X_INTVL, X_NUMBER, MAX_GENS)
+nl_brkga <- function(func_, lowerLimit, upperLimit, p = 100L, pe = 0.10, pm = 0.10, rhoe = 0.70, K = 3L, MAXT = 1L, verbose = FALSE, rngSeed = 0L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 1000L) {
+    .Call(`_brkga_nl_brkga`, func_, lowerLimit, upperLimit, p, pe, pm, rhoe, K, MAXT, verbose, rngSeed, X_INTVL, X_NUMBER, MAX_GENS)
 }
 
 Ackleys <- function(X) {
@@ -195,5 +195,9 @@ Zeldasine <- function(X, A = 2.5, B = 5.) {
 
 reg_beta <- function(X, data) {
     .Call(`_brkga_reg_beta`, X, data)
+}
+
+reg_brkga <- function(func_, lowerLimit, upperLimit, p = 100L, pe = 0.10, pm = 0.10, rhoe = 0.70, K = 3L, MAXT = 1L, verbose = FALSE, data = NULL, rngSeed = 0L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 1000L) {
+    .Call(`_brkga_reg_brkga`, func_, lowerLimit, upperLimit, p, pe, pm, rhoe, K, MAXT, verbose, data, rngSeed, X_INTVL, X_NUMBER, MAX_GENS)
 }
 

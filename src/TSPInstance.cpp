@@ -7,7 +7,7 @@
 
 #include "TSPInstance.h"
 
-TSPInstance::TSPInstance(const std::string& instanceFile) throw(TSPInstance::Error) :
+TSPInstance::TSPInstance(const std::string& instanceFile) :
 		name(""), comment(""), problemType(""), edgeWeightType(""),
 		nNodes(0), nodeCoords() {
 	std::ifstream fin(instanceFile.c_str());
@@ -65,7 +65,7 @@ unsigned TSPInstance::getDistance(unsigned i, unsigned j) const {
 	return std::floor((x2 + y2) + 0.5);
 }
 
-void TSPInstance::readName(const std::string& line) throw(TSPInstance::Error) {
+void TSPInstance::readName(const std::string& line) {
 	if(line.find("NAME") == std::string::npos) {
 		throw Error("Cannot recognize instance: NAME not where it should be.");
 	}
@@ -74,7 +74,7 @@ void TSPInstance::readName(const std::string& line) throw(TSPInstance::Error) {
 	trim(name);	// this instance format is horrible!
 }
 
-void TSPInstance::readComment(const std::string& line) throw(TSPInstance::Error) {
+void TSPInstance::readComment(const std::string& line) {
 	if(line.find("COMMENT") == std::string::npos) {
 		throw Error("Cannot recognize instance: NAME not where it should be.");
 	}
@@ -83,7 +83,7 @@ void TSPInstance::readComment(const std::string& line) throw(TSPInstance::Error)
 	trim(comment);	// this instance format is horrible!
 }
 
-void TSPInstance::readProblemType(const std::string& line) throw(TSPInstance::Error) {
+void TSPInstance::readProblemType(const std::string& line) {
 	if(line.find("TYPE") == std::string::npos) {
 		throw Error("Cannot recognize instance: NAME not where it should be.");
 	}
@@ -94,7 +94,7 @@ void TSPInstance::readProblemType(const std::string& line) throw(TSPInstance::Er
 	if(problemType != "TSP") { throw Error("Cannot work on instance type " + problemType); }
 }
 
-void TSPInstance::readDimension(const std::string& line) throw(TSPInstance::Error) {
+void TSPInstance::readDimension(const std::string& line) {
 	if(line.find("DIMENSION") == std::string::npos) {
 		throw Error("Cannot recognize instance: NAME not where it should be.");
 	}
@@ -105,7 +105,7 @@ void TSPInstance::readDimension(const std::string& line) throw(TSPInstance::Erro
 	nodeCoords.resize(nNodes);
 }
 
-void TSPInstance::readEdgeWeightType(const std::string& line) throw(TSPInstance::Error) {
+void TSPInstance::readEdgeWeightType(const std::string& line) {
 	if(line.find("EDGE_WEIGHT_TYPE") == std::string::npos) {
 		throw Error("Cannot recognize instance: NAME not where it should be.");
 	}
@@ -116,7 +116,7 @@ void TSPInstance::readEdgeWeightType(const std::string& line) throw(TSPInstance:
 	if(edgeWeightType != "EUC_2D") { throw Error("Cannot only work with instance type EUC_2D."); }
 }
 
-void TSPInstance::readNodeCoords(const std::string& line) throw(TSPInstance::Error) {
+void TSPInstance::readNodeCoords(const std::string& line) {
 	// Assumes a 2D instance:
 	std::istringstream sin(line);
 

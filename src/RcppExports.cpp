@@ -18,8 +18,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // nl_brkga
-Rcpp::List nl_brkga(SEXP func_, arma::vec lowerLimit, arma::vec upperLimit, const unsigned p, const double pe, const double pm, const double rhoe, const unsigned K, const unsigned MAXT, const bool verbose, Rcpp::Nullable<Rcpp::NumericMatrix> data, const long unsigned rngSeed, const unsigned X_INTVL, const unsigned X_NUMBER, const unsigned MAX_GENS);
-RcppExport SEXP _brkga_nl_brkga(SEXP func_SEXP, SEXP lowerLimitSEXP, SEXP upperLimitSEXP, SEXP pSEXP, SEXP peSEXP, SEXP pmSEXP, SEXP rhoeSEXP, SEXP KSEXP, SEXP MAXTSEXP, SEXP verboseSEXP, SEXP dataSEXP, SEXP rngSeedSEXP, SEXP X_INTVLSEXP, SEXP X_NUMBERSEXP, SEXP MAX_GENSSEXP) {
+Rcpp::List nl_brkga(SEXP func_, arma::vec lowerLimit, arma::vec upperLimit, const unsigned p, const double pe, const double pm, const double rhoe, const unsigned K, const unsigned MAXT, const bool verbose, const long unsigned rngSeed, const unsigned X_INTVL, const unsigned X_NUMBER, const unsigned MAX_GENS);
+RcppExport SEXP _brkga_nl_brkga(SEXP func_SEXP, SEXP lowerLimitSEXP, SEXP upperLimitSEXP, SEXP pSEXP, SEXP peSEXP, SEXP pmSEXP, SEXP rhoeSEXP, SEXP KSEXP, SEXP MAXTSEXP, SEXP verboseSEXP, SEXP rngSeedSEXP, SEXP X_INTVLSEXP, SEXP X_NUMBERSEXP, SEXP MAX_GENSSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -33,12 +33,11 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const unsigned >::type K(KSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type MAXT(MAXTSEXP);
     Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericMatrix> >::type data(dataSEXP);
     Rcpp::traits::input_parameter< const long unsigned >::type rngSeed(rngSeedSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type X_INTVL(X_INTVLSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type X_NUMBER(X_NUMBERSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type MAX_GENS(MAX_GENSSEXP);
-    rcpp_result_gen = Rcpp::wrap(nl_brkga(func_, lowerLimit, upperLimit, p, pe, pm, rhoe, K, MAXT, verbose, data, rngSeed, X_INTVL, X_NUMBER, MAX_GENS));
+    rcpp_result_gen = Rcpp::wrap(nl_brkga(func_, lowerLimit, upperLimit, p, pe, pm, rhoe, K, MAXT, verbose, rngSeed, X_INTVL, X_NUMBER, MAX_GENS));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -569,10 +568,35 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// reg_brkga
+Rcpp::List reg_brkga(SEXP func_, arma::vec lowerLimit, arma::vec upperLimit, const unsigned p, const double pe, const double pm, const double rhoe, const unsigned K, const unsigned MAXT, const bool verbose, Rcpp::Nullable<Rcpp::NumericMatrix> data, const long unsigned rngSeed, const unsigned X_INTVL, const unsigned X_NUMBER, const unsigned MAX_GENS);
+RcppExport SEXP _brkga_reg_brkga(SEXP func_SEXP, SEXP lowerLimitSEXP, SEXP upperLimitSEXP, SEXP pSEXP, SEXP peSEXP, SEXP pmSEXP, SEXP rhoeSEXP, SEXP KSEXP, SEXP MAXTSEXP, SEXP verboseSEXP, SEXP dataSEXP, SEXP rngSeedSEXP, SEXP X_INTVLSEXP, SEXP X_NUMBERSEXP, SEXP MAX_GENSSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type func_(func_SEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type lowerLimit(lowerLimitSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type upperLimit(upperLimitSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type p(pSEXP);
+    Rcpp::traits::input_parameter< const double >::type pe(peSEXP);
+    Rcpp::traits::input_parameter< const double >::type pm(pmSEXP);
+    Rcpp::traits::input_parameter< const double >::type rhoe(rhoeSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type K(KSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type MAXT(MAXTSEXP);
+    Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericMatrix> >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const long unsigned >::type rngSeed(rngSeedSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type X_INTVL(X_INTVLSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type X_NUMBER(X_NUMBERSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type MAX_GENS(MAX_GENSSEXP);
+    rcpp_result_gen = Rcpp::wrap(reg_brkga(func_, lowerLimit, upperLimit, p, pe, pm, rhoe, K, MAXT, verbose, data, rngSeed, X_INTVL, X_NUMBER, MAX_GENS));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_brkga_tsp_brkga", (DL_FUNC) &_brkga_tsp_brkga, 1},
-    {"_brkga_nl_brkga", (DL_FUNC) &_brkga_nl_brkga, 15},
+    {"_brkga_nl_brkga", (DL_FUNC) &_brkga_nl_brkga, 14},
     {"_brkga_Ackleys", (DL_FUNC) &_brkga_Ackleys, 1},
     {"_brkga_AluffiPentini", (DL_FUNC) &_brkga_AluffiPentini, 1},
     {"_brkga_BeckerLago", (DL_FUNC) &_brkga_BeckerLago, 1},
@@ -620,6 +644,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_brkga_Wood", (DL_FUNC) &_brkga_Wood, 1},
     {"_brkga_Zeldasine", (DL_FUNC) &_brkga_Zeldasine, 3},
     {"_brkga_reg_beta", (DL_FUNC) &_brkga_reg_beta, 2},
+    {"_brkga_reg_brkga", (DL_FUNC) &_brkga_reg_brkga, 15},
     {NULL, NULL, 0}
 };
 

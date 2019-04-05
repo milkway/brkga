@@ -34,7 +34,7 @@
  */
 #include "nlDecoder.h"
 
-nlDecoder::nlDecoder(SEXP _func_, arma::vec lowerLimit, arma::vec upperLimit, arma::mat data) :  func_(_func_), lLim(lowerLimit), uLim(upperLimit), data_(data) { }
+nlDecoder::nlDecoder(SEXP _func_, arma::vec lowerLimit, arma::vec upperLimit) :  func_(_func_), lLim(lowerLimit), uLim(upperLimit) { }
 
 nlDecoder::~nlDecoder() { }
 
@@ -49,7 +49,7 @@ double nlDecoder::decode(const std::vector< double >& chromosome) const {
 	  rank[i] = ValueKeyPair(chromosome[i], i);
 	  Point[i] = chromosome[i]*(uLim[i] - lLim[i]) + lLim[i];
 	}
-	double myFitness = Rcpp::as<double>(func(Point, data_));
+	double myFitness = Rcpp::as<double>(func(Point));
 	// Here we sort 'permutation', which will then produce a permutation of [n]
 	// stored in ValueKeyPair::second:
 	std::sort(rank.begin(), rank.end());
@@ -60,8 +60,6 @@ double nlDecoder::decode(const std::vector< double >& chromosome) const {
 		permutation.push_back(i->second);
 	}
 	
-	//Rcpp::Rcout << "Data Matrix " << data_.n_rows << " : " << data_.n_cols << " : "<< arma::size(data_) << std::endl;
-
 	// Return the fitness:
 	return myFitness;
 }

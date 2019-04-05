@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1554462170558.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1775259247",
+    "id" : "F33766B9",
+    "lastKnownWriteTime" : 1554462474,
+    "last_content_update" : 1554462474992,
+    "path" : "~/Documents/brkga/src/regDecoder.cpp",
+    "project_path" : "src/regDecoder.cpp",
+    "properties" : {
+        "cursorPosition" : "38,3",
+        "scrollLine" : "29"
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "cpp"
+}

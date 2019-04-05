@@ -61,7 +61,6 @@ Rcpp::List nl_brkga(SEXP func_,
               const unsigned K = 3,	  	// number of independent populations
               const unsigned MAXT = 1,  	// number of threads for parallel decoding
               const bool verbose = false,
-              Rcpp::Nullable<Rcpp::NumericMatrix> data  = R_NilValue,
               const long unsigned rngSeed = 0,	// seed to the random number generator
               const unsigned X_INTVL = 100,	// exchange best individuals at every X_INTVL generations
               const unsigned X_NUMBER = 2,	// exchange top X_NUMBER best
@@ -72,19 +71,9 @@ Rcpp::List nl_brkga(SEXP func_,
   if (lowerLimit.n_rows != upperLimit.n_rows) Rcpp::stop("Limit vector must have the same lenght");
   
   const unsigned n = lowerLimit.n_rows; // size of chromosomes
-
-  
-  
-  //if (data.isNotNull()) {
-  Rcpp::NumericMatrix nm_data;
-  if (data.isNotNull()) nm_data = Rcpp::as<Rcpp::NumericMatrix>(data);
-  arma::mat data_arma = Rcpp::as<arma::mat>(nm_data);
-  
-
   //const arma::mat& db = arma::zeros(0,0); //Rcpp::as<arma::mat>(data)arma::mat& db = arma::zeros(0,0); //Rcpp::as<arma::mat>(data)
   
-
-	nlDecoder decoder(func_, lowerLimit, upperLimit, data_arma);				// initialize the decoder
+	nlDecoder decoder(func_, lowerLimit, upperLimit);				// initialize the decoder
 	
 	//const long unsigned rngSeed = 0;	// seed to the random number generator
 	MTRand rng(rngSeed);				// initialize the random number generator

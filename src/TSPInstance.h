@@ -39,7 +39,7 @@ class TSPInstance {
 public:
 	typedef std::runtime_error Error;
 
-	TSPInstance(const std::string& instanceFile) throw(Error);
+	TSPInstance(const std::string& instanceFile);
 	virtual ~TSPInstance();
 
 	// Getters:
@@ -75,13 +75,13 @@ private:
 
 	std::vector< Coord2D > nodeCoords;
 
-	void readName(const std::string& line) throw(Error);
-	void readComment(const std::string& line) throw(Error);
-	void readProblemType(const std::string& line) throw(Error);
-	void readDimension(const std::string& line) throw(Error);
-	void readEdgeWeightType(const std::string& line) throw(Error);
+	void readName(const std::string& line);
+	void readComment(const std::string& line);
+	void readProblemType(const std::string& line);
+	void readDimension(const std::string& line);
+	void readEdgeWeightType(const std::string& line);
 
-	void readNodeCoords(const std::string& line) throw(Error);
+	void readNodeCoords(const std::string& line);
 	bool isEOF(const std::string& line) const;
 	void trim(std::string& str) const;
 };

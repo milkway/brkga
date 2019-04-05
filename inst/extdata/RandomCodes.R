@@ -11,7 +11,7 @@ cpp <- "SEXP obj(const std::vector< double >& X) {
         }"
 func_cpp <- cppXPtr(cpp)
 checkXPtr(func_cpp, "SEXP", c("const std::vector< double >&"))
-brkga::api_usage(func_ = func_cpp, lowerLimit = rep(0, 10), upperLimit = rep(1, 10), K = 5)
+brkga::nl_brkga(func_ = func_cpp, lowerLimit = rep(0, 10), upperLimit = rep(1, 10), K = 50)
 
 
 cpp <- "SEXP Ackleys(const std::vector< double >& X){

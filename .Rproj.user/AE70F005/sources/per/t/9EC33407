@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1554462682226.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2371568469",
+    "id" : "9EC33407",
+    "lastKnownWriteTime" : 1554463199,
+    "last_content_update" : 1554463199824,
+    "path" : "~/Documents/brkga/src/BRKGA.h",
+    "project_path" : "src/BRKGA.h",
+    "properties" : {
+        "cursorPosition" : "180,63",
+        "scrollLine" : "172"
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "h"
+}

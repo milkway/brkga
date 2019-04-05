@@ -60,11 +60,11 @@
 #include <algorithm>
 
 
-typedef SEXP (*funcPtr)(const std::vector< double >&, const arma::mat&);
+typedef SEXP (*funcPtr)(const std::vector< double >&);
 
 class nlDecoder {
 public:
-	nlDecoder(SEXP func_, arma::vec lLim, arma::vec uLim, arma::mat data_);	// Constructor
+	nlDecoder(SEXP func_, arma::vec lLim, arma::vec uLim);	// Constructor
 	~nlDecoder();	// Destructor
 
 	// Decode a chromosome, returning its fitness as a double-precision floating point:
@@ -74,7 +74,6 @@ private:
   arma::vec lLim;
   arma::vec uLim;
   SEXP func_;
-  arma::mat data_;
 };
 
 #endif

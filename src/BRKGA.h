@@ -98,7 +98,7 @@ public:
 	 *                + double Decoder::decode(std::vector< double >& chromosome) const
 	 */
 	BRKGA(unsigned n, unsigned p, double pe, double pm, double rhoe, const Decoder& refDecoder,
-			RNG& refRNG, unsigned K = 1, unsigned MAX_THREADS = 1) throw(std::range_error);
+			RNG& refRNG, unsigned K = 1, unsigned MAX_THREADS = 1);
 
 	/**
 	 * Destructor
@@ -122,7 +122,7 @@ public:
 	 * Exchange elite-solutions between the populations
 	 * @param M number of elite chromosomes to select from each population
 	 */
-	void exchangeElite(unsigned M) throw(std::range_error);
+	void exchangeElite(unsigned M);
 
 	/**
 	 * Returns the current population
@@ -178,7 +178,7 @@ private:
 
 template< class Decoder, class RNG >
 BRKGA< Decoder, RNG >::BRKGA(unsigned _n, unsigned _p, double _pe, double _pm, double _rhoe,
-		const Decoder& decoder, RNG& rng, unsigned _K, unsigned MAX) throw(std::range_error) :
+		const Decoder& decoder, RNG& rng, unsigned _K, unsigned MAX) :
 		n(_n), p(_p), pe(unsigned(_pe * p)), pm(unsigned(_pm * p)), rhoe(_rhoe), refRNG(rng),
 		refDecoder(decoder), K(_K), MAX_THREADS(MAX), previous(K, 0), current(K, 0) {
 	// Error check:
@@ -257,7 +257,7 @@ void BRKGA< Decoder, RNG >::evolve(unsigned generations) {
 }
 
 template< class Decoder, class RNG >
-void BRKGA< Decoder, RNG >::exchangeElite(unsigned M) throw(std::range_error) {
+void BRKGA< Decoder, RNG >::exchangeElite(unsigned M) {
 	#ifdef RANGECHECK
 		if(M == 0 || M >= p) { throw std::range_error("M cannot be zero or >= p."); }
 	#endif
