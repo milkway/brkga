@@ -17,6 +17,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// mdp_brkga
+Rcpp::List mdp_brkga(std::string instanceFile, const unsigned MAX_TIME, const unsigned p, const double pe, const double pm, const double rhoe, const unsigned K, const unsigned MAXT, const unsigned X_INTVL, const unsigned X_NUMBER, const unsigned MAX_GENS, const unsigned SEM_MELHORA, const bool verbose, const long unsigned rngSeed);
+RcppExport SEXP _brkga_mdp_brkga(SEXP instanceFileSEXP, SEXP MAX_TIMESEXP, SEXP pSEXP, SEXP peSEXP, SEXP pmSEXP, SEXP rhoeSEXP, SEXP KSEXP, SEXP MAXTSEXP, SEXP X_INTVLSEXP, SEXP X_NUMBERSEXP, SEXP MAX_GENSSEXP, SEXP SEM_MELHORASEXP, SEXP verboseSEXP, SEXP rngSeedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type instanceFile(instanceFileSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type MAX_TIME(MAX_TIMESEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type p(pSEXP);
+    Rcpp::traits::input_parameter< const double >::type pe(peSEXP);
+    Rcpp::traits::input_parameter< const double >::type pm(pmSEXP);
+    Rcpp::traits::input_parameter< const double >::type rhoe(rhoeSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type K(KSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type MAXT(MAXTSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type X_INTVL(X_INTVLSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type X_NUMBER(X_NUMBERSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type MAX_GENS(MAX_GENSSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type SEM_MELHORA(SEM_MELHORASEXP);
+    Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< const long unsigned >::type rngSeed(rngSeedSEXP);
+    rcpp_result_gen = Rcpp::wrap(mdp_brkga(instanceFile, MAX_TIME, p, pe, pm, rhoe, K, MAXT, X_INTVL, X_NUMBER, MAX_GENS, SEM_MELHORA, verbose, rngSeed));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nl_brkga
 Rcpp::List nl_brkga(SEXP func_, arma::vec lowerLimit, arma::vec upperLimit, const unsigned p, const double pe, const double pm, const double rhoe, const unsigned K, const unsigned MAXT, const bool verbose, const long unsigned rngSeed, const unsigned X_INTVL, const unsigned X_NUMBER, const unsigned MAX_GENS);
 RcppExport SEXP _brkga_nl_brkga(SEXP func_SEXP, SEXP lowerLimitSEXP, SEXP upperLimitSEXP, SEXP pSEXP, SEXP peSEXP, SEXP pmSEXP, SEXP rhoeSEXP, SEXP KSEXP, SEXP MAXTSEXP, SEXP verboseSEXP, SEXP rngSeedSEXP, SEXP X_INTVLSEXP, SEXP X_NUMBERSEXP, SEXP MAX_GENSSEXP) {
@@ -596,6 +620,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_brkga_tsp_brkga", (DL_FUNC) &_brkga_tsp_brkga, 1},
+    {"_brkga_mdp_brkga", (DL_FUNC) &_brkga_mdp_brkga, 14},
     {"_brkga_nl_brkga", (DL_FUNC) &_brkga_nl_brkga, 14},
     {"_brkga_Ackleys", (DL_FUNC) &_brkga_Ackleys, 1},
     {"_brkga_AluffiPentini", (DL_FUNC) &_brkga_AluffiPentini, 1},

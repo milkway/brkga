@@ -5,14 +5,14 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "1151034074",
+    "hash" : "3904497684",
     "id" : "366B9687",
-    "lastKnownWriteTime" : 1554462625,
-    "last_content_update" : 1554462625292,
+    "lastKnownWriteTime" : 1554725861,
+    "last_content_update" : 1554725861023,
     "path" : "~/Documents/brkga/src/nl_brkga.cpp",
     "project_path" : "src/nl_brkga.cpp",
     "properties" : {
-        "cursorPosition" : "61,54",
+        "cursorPosition" : "67,12",
         "scrollLine" : "48"
     },
     "relative_order" : 4,

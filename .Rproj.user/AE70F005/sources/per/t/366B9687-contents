@@ -47,9 +47,25 @@
 #include "MTRand.h"
 #include "nlDecoder.h"
 
-// via the exports attribute we tell Rcpp to make this function
-// available from R
-//
+//' Execute a MDP solution search using BRKGA
+//' @details Escrever um detalhamento bem legal e super bacana
+//'  aqui.
+//' @param MAX_TIME  Max time of execution in seconds
+//' @param p  Size of population
+//' @param pe Fraction of population to be the elite-set
+//' @param pm Fraction of population to be replaced by mutants
+//' @param rhoe Frobability that offspring inherit an allele from elite parent
+//' @param K number of independent populations
+//' @param MAXT number of threads for parallel decoding
+//' @param X_INTVL Exchange best individuals at every 100 generations
+//' @param X_NUMBER Exchange top 2 best
+//' @param MAX_GENS Max number of generations
+//' @param SEM_MELHORA  Pergunte para Geiza
+//' @param verbose Level of output information
+//' @param rngSeed Seed to the random number generator
+//' @return A numeric vector of random values
+//' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
+//' @export 
 // [[Rcpp::export]]
 Rcpp::List nl_brkga(SEXP func_,
               arma::vec lowerLimit, // lower limit
@@ -89,25 +105,28 @@ Rcpp::List nl_brkga(SEXP func_,
 	std::cout << "Running for " << MAX_GENS << " generations..." << std::endl;
 	do {
 		algorithm.evolve();	// evolve the population for one generation
-		
 		if((++generation) % X_INTVL == 0) {
 			algorithm.exchangeElite(X_NUMBER);	// exchange top individuals
 		}
 	} while (generation < MAX_GENS);
 	
-	// print the fitness of the top 10 individuals of each population:
-	Rcpp::Rcout << "Fitness of the top 10 individuals of each population:" << std::endl;
-	const unsigned bound = std::min(p, unsigned(10));	// makes sure we have 10 individuals
-	for(unsigned i = 0; i < K; ++i) {
-	  Rcpp::Rcout << "Population #" << i << ":" << std::endl;
-		for(unsigned j = 0; j < bound; ++j) {
-		  Rcpp::Rcout << "\t" << j << ") "
-					<< algorithm.getPopulation(i).getFitness(j) << std::endl;
-		}
-	}
 	
-	Rcpp::Rcout << "Best solution found has objective value = "
-	 		<< algorithm.getBestFitness() << std::endl;
+	if (verbose){
+	  // print the fitness of the top 10 individuals of each population:
+	  Rcpp::Rcout << "Fitness of the top 10 individuals of each population:" << std::endl;
+	  const unsigned bound = std::min(p, unsigned(10));	// makes sure we have 10 individuals
+	  for(unsigned i = 0; i < K; ++i) {
+	    Rcpp::Rcout << "Population #" << i << ":" << std::endl;
+	    for(unsigned j = 0; j < bound; ++j) {
+	      Rcpp::Rcout << "\t" << j << ") "
+                   << algorithm.getPopulation(i).getFitness(j) << std::endl;
+	    }
+	  }
+	  
+	  Rcpp::Rcout << "Best solution found has objective value = "
+               << algorithm.getBestFitness() << std::endl;
+	  
+	}
 	
 	Rcpp::NumericVector Point(n);
 	Rcpp::CharacterVector rowNames(n);

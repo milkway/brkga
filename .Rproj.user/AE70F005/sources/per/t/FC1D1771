@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1554725920517.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1832574608",
+    "id" : "FC1D1771",
+    "lastKnownWriteTime" : 1554725928,
+    "last_content_update" : 1554725928525,
+    "path" : "~/Documents/brkga/src/brkga-tsp.cpp",
+    "project_path" : "src/brkga-tsp.cpp",
+    "properties" : {
+        "cursorPosition" : "73,12",
+        "scrollLine" : "58"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "cpp"
+}
