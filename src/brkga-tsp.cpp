@@ -73,7 +73,7 @@
 //' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
 //' @export 
 // [[Rcpp::export]]
-int tsp_brkga(std::string instanceFile) {
+Rcpp::List tsp_brkga(std::string instanceFile) {
 
 	Rcpp::Rcout << "Welcome to the BRKGA API sample driver.\nFinding a (heuristic) minimizer for "
 			<< " the TSP." << std::endl;
@@ -196,5 +196,7 @@ int tsp_brkga(std::string instanceFile) {
 	const clock_t end = clock();
 	Rcpp::Rcout << "BRKGA run finished in " << (end - begin) / double(CLOCKS_PER_SEC) << " s." << std::endl;
 
-	return 0;
+	return Rcpp::List::create(Rcpp::Named("Chromosome") = algorithm.getBestChromosome(),
+                           Rcpp::Named("BestFitness") = algorithm.getBestFitness(),
+                           Rcpp::Named("Tour") = bestTour);
 }

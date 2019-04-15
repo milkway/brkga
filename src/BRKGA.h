@@ -125,6 +125,12 @@ public:
 	void exchangeElite(unsigned M);
 
 	/**
+	 * Exchange worst solution for best of local search
+	 */
+	void exchangeAlleles(const std::vector< double >& BestOfLS, unsigned k_K, unsigned dest, double Ftnss);
+	
+	
+	/**
 	 * Returns the current population
 	 */
 	const Population& getPopulation(unsigned k = 0) const;
@@ -284,6 +290,21 @@ void BRKGA< Decoder, RNG >::exchangeElite(unsigned M) {
 
 	for(int j = 0; j < int(K); ++j) { current[j]->sortFitness(); }
 }
+
+template< class Decoder, class RNG >
+void BRKGA< Decoder, RNG >::exchangeAlleles(const std::vector< double >& BestOfLS, unsigned k_K, unsigned dest, double Ftnss) {
+#ifdef RANGECHECK
+  if(dest >= p) { Rcpp::stop("dest cannot be zero or >= p."); }
+  if(k_K >= k_K) { Rcpp::stop("k_K_M cannot be zero or >= K."); }
+  if(Ftnss > 1 || Ftnss < 0) { Rcpp::stop("Ftnss must be in [0,1] interval"); }
+#endif
+  /// dest = p - 1;	// Last chromosome of i (will be updated below)
+  std::copy(BestOfLS.begin(), BestOfLS.end(), current[k_K]->getChromosome(dest).begin());
+  current[k_K]->fitness[dest].first = -Ftnss;
+  for(int j = 0; j < int(K); ++j) { current[j]->sortFitness(); }
+}
+
+
 
 template< class Decoder, class RNG >
 inline void BRKGA< Decoder, RNG >::initialize(const unsigned i) {

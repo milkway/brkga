@@ -7,7 +7,7 @@
 using namespace Rcpp;
 
 // tsp_brkga
-int tsp_brkga(std::string instanceFile);
+Rcpp::List tsp_brkga(std::string instanceFile);
 RcppExport SEXP _brkga_tsp_brkga(SEXP instanceFileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
