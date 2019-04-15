@@ -18,7 +18,7 @@
 #ifndef MDPDECODER_H
 #define MDPDECODER_H
 
-
+#include <RcppArmadillo.h>
 #include <list>
 #include <vector>
 #include <algorithm>
@@ -27,13 +27,15 @@
 
 class MdpDecoder {
 public:
-	MdpDecoder();
+	MdpDecoder(arma::mat DistanceMatrix_, unsigned m_);
 	~MdpDecoder();
 
 	double decode(const std::vector< double >& chromosome) const;
 //	double decode(const std::vector< double >& chromosome, std::vector< double > dist, unsigned m) const;
 
 private:
+        arma::mat DistanceMatrix_;
+        unsigned m_;
 };
 
 #endif

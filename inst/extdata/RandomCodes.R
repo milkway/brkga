@@ -1,5 +1,8 @@
 
 
+MDGa1n500m50 <- MDGa1n500m50[1:500,1:500]
+
+write_rds(MDGa1n500m50, path = "inst/extdata/MDGa1n500m50.rds")
 
 library(RcppXPtrUtils)
 

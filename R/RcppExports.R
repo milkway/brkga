@@ -27,7 +27,8 @@ tsp_brkga <- function(instanceFile) {
 #' Execute a MDP solution search using BRKGA
 #' @details Escrever um detalhamento bem legal e super bacana
 #'  aqui.
-#' @param instanceFile Path to file containing the instance 
+#' @param distances Distance matrix of the instance 
+#' @param m Number of elements selected (m <= n)
 #' @param MAX_TIME  Max time of execution in seconds
 #' @param p  Size of population
 #' @param pe Fraction of population to be the elite-set
@@ -44,8 +45,8 @@ tsp_brkga <- function(instanceFile) {
 #' @return A numeric vector of random values
 #' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
 #' @export 
-mdp_brkga <- function(instanceFile, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 1L, MAXT = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 1000L, SEM_MELHORA = 0L, verbose = FALSE, rngSeed = 0L) {
-    .Call(`_brkga_mdp_brkga`, instanceFile, MAX_TIME, p, pe, pm, rhoe, K, MAXT, X_INTVL, X_NUMBER, MAX_GENS, SEM_MELHORA, verbose, rngSeed)
+mdp_brkga <- function(DistanceMatrix, m, method = 0L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 1L, MAXT = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L, verbose = FALSE, rngSeed = 0L) {
+    .Call(`_brkga_mdp_brkga`, DistanceMatrix, m, method, MAX_TIME, p, pe, pm, rhoe, K, MAXT, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed)
 }
 
 #' Execute a MDP solution search using BRKGA

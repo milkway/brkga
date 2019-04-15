@@ -18,18 +18,15 @@
 
 //#ifndef _OPENMP
 //#define _OPENMP 1
-
-std::vector< double >  dist;	// Vector of distances ROW*COL elements
-unsigned m;
+// Used to sort ranking by second argument
+bool compare(const std::pair<double, int>&i, const std::pair<double, int>&j)
+{
+  return i.second < j.second;
+}
 
 
 // Runs in \Theta(n \log n):
-Rcpp::List localSearch(const std::vector< double >& chromosome){
-  
-  // Fitness of choromosome
-  double myFitness = 0.0;
-  std::vector<double> lsChromosome(chromosome);
-  //std::copy(chromosome.begin(), chromosome.end(), lsChromosome.begin()); 
+Rcpp::List localSearch(const std::vector< double >& chromosome, double myFitness, const arma::mat& DistMat, unsigned m){
   
   std::vector< std::pair< double, unsigned > > ranking(chromosome.size());
   
@@ -40,77 +37,62 @@ Rcpp::List localSearch(const std::vector< double >& chromosome){
   
   // Here we sort 'permutation', which will then produce a permutation of [n] in pair::second:
   std::sort(ranking.begin(), ranking.end());
-  
-  // permutation[i].second is in {0, ..., n - 1}; a permutation can be obtained as follows
-  std::vector< unsigned > permutation;
-  for(auto i = ranking.begin();
-      i != ranking.begin()+m; ++i) {
-    permutation.push_back(i->second);
-  }
-  
-  
-  
-  // Here we compute the fitness of chromosome by permutation obtained
-  unsigned elem1, elem2;
-  for (auto i = permutation.begin(); i != (permutation.end()); ++i) {
-    elem1 = *i;
-    for (auto j = i;j != permutation.end(); ++j) {
-      elem2 = *j;
-      myFitness += dist[elem1*chromosome.size()+elem2];
-    }
-  }
+  std::set< unsigned> M;
+  for(auto it = ranking.begin(); it != ranking.begin() + m; ++it) 
+    M.insert((*it).second);
+  std::sort(ranking.begin(),ranking.end(), compare);
   
   // Set N-M
-  std::vector <unsigned> N_M; //Non selected elements of N
-  std::vector <unsigned> M(permutation); //selected elements of N
-  permutation.push_back(-1);
-  
-  for(unsigned i=0; i < chromosome.size(); i++){
-    auto it = std::find(permutation.begin(), permutation.end(), i);
-    if (it == permutation.end()) N_M.push_back(i);
+  std::set< unsigned > N_M;
+  for(unsigned i = 0; i < chromosome.size(); i++){
+    auto it = M.find(i);
+    if (it == M.end()) N_M.insert(i);
   }
-  
-  /*
-  for(std::list< unsigned >::const_iterator pt = N_M.begin(); pt != N_M.end(); ++pt) {
-  std::cout << " " << *pt;
-  }
-  std::cout << std::endl;*/
-  double delta_Z, max_delta_Z=0, LocalSearchFitness=myFitness;
-  double temp = 0;
-  //std::list< unsigned >::const_iterator max_it_m, max_it_n_m;
-  unsigned max_it_m, max_it_n_m;
+
+  double LocalSearchFitness = myFitness;
+
+  // std::random_device rd;
+  // std::mt19937 g(rd());
+  // 
+  // std::shuffle(M.begin(), M.end(),g);
+  // std::shuffle(N_M.begin(), N_M.end(),g);
   
   //First Improvement
+  double delta_Z = 0;
   for(auto it_m = M.begin(); it_m != M.end(); ++it_m) {
     for(auto it_n_m = N_M.begin(); it_n_m != N_M.end(); ++it_n_m) {
       // calculando o delta z (vizinho - melhor_Solucao)
-      delta_Z=0;
+      delta_Z = 0;
       Rcpp::checkUserInterrupt();
       for(auto item = M.begin(); item != M.end(); item++) {
         if (*item != *it_m) 
-          delta_Z+=-dist[*it_m*chromosome.size()+*item]+dist[*it_n_m*chromosome.size()+*item];
+          delta_Z += -DistMat(*it_m, *item) + DistMat(*it_n_m, *item);
       }
       if (delta_Z > 0) {
-        //Rcpp::Rcout << "Atualização da solução : "<< delta_Z << " M "<< it_m - M.begin() <<  " N " << it_n_m - N_M.begin() << std::endl; 
-        temp = lsChromosome[*it_m];
-        lsChromosome[*it_m] = lsChromosome[*it_n_m];
-        lsChromosome[*it_n_m] = temp;
-        std::iter_swap(it_m, it_n_m);
-        LocalSearchFitness+=delta_Z;
+        M.insert(*it_n_m);
+        double aux = ranking[*it_m].first;
+        ranking[*it_m].first = ranking[*it_n_m].first;
+        ranking[*it_n_m].first = aux;
+        N_M.insert(*it_m);
+        M.erase(*it_m);
+        N_M.erase(*it_n_m);
+        
+        // PENSAR: Modificar o cromossomo com a sol da busca
+        LocalSearchFitness -= delta_Z;
         it_m = M.begin();
         it_n_m = N_M.begin();
-        //std::prev(it_m, it_m - M.begin() - 1);
-        //std::prev(it_n_m, it_n_m - N_M.begin() - 1);
       } 
     }
   }
-  //myFitness=myFitness+max_delta_Z;
+  
+  std::vector<double> chrm(chromosome.size());
+  for(auto it = ranking.begin(); it != ranking.end(); ++it) 
+    chrm[it - ranking.begin()] = (*it).first;
   
   Rcpp::List rst = Rcpp::List::create(
-    Rcpp::Named("Chromosome") = lsChromosome,
+    Rcpp::Named("Chromosome") = chrm,
     Rcpp::Named("Solution") = M,
-    Rcpp::Named("Fitness") = myFitness,
-    Rcpp::Named("LocalSearchFitness") = LocalSearchFitness);
+    Rcpp::Named("lsFitness") = LocalSearchFitness);
   
   return rst;
 }
@@ -119,7 +101,8 @@ Rcpp::List localSearch(const std::vector< double >& chromosome){
 //' Execute a MDP solution search using BRKGA
 //' @details Escrever um detalhamento bem legal e super bacana
 //'  aqui.
-//' @param instanceFile Path to file containing the instance 
+//' @param distances Distance matrix of the instance 
+//' @param m Number of elements selected (m <= n)
 //' @param MAX_TIME  Max time of execution in seconds
 //' @param p  Size of population
 //' @param pe Fraction of population to be the elite-set
@@ -137,7 +120,9 @@ Rcpp::List localSearch(const std::vector< double >& chromosome){
 //' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
 //' @export 
 // [[Rcpp::export]]
-Rcpp::List mdp_brkga(std::string instanceFile, 
+Rcpp::List mdp_brkga(const arma::mat DistanceMatrix, 
+                     const unsigned m, // Number of elements selected (m <= n)
+                     const unsigned method =  0, // 0: BRKGA; 1: BRKGA + LS; 2: BRKGA(LS) 
                      const unsigned     MAX_TIME = 10,	 // run for 10 seconds
                      const unsigned            p = 500,	 // size of population
                      const double             pe = 0.20, // fraction of population to be the elite-set
@@ -147,110 +132,96 @@ Rcpp::List mdp_brkga(std::string instanceFile,
                      const unsigned         MAXT = 8,    // number of threads for parallel decoding
                      const unsigned      X_INTVL = 100,	 // exchange best individuals at every 100 generations
                      const unsigned     X_NUMBER = 2,	   // exchange top 2 best
-                     const unsigned     MAX_GENS = 1000, // run for 1000 gens
-                     const unsigned  SEM_MELHORA = 0,
+                     const unsigned     MAX_GENS = 100, // Max generations without improvement 
+                     const unsigned RESET_AFTER = 200, 
                      const bool          verbose = false, 
                      const long unsigned rngSeed = 0	   // seed to the random number generator
 ) {
   
-  unsigned n;				// size of chromosomes
-  MdpDecoder decoder;			// initialize the decoder
+  if (DistanceMatrix.n_cols != DistanceMatrix.n_rows) Rcpp::stop("Distance matrix must be square!");
+  unsigned n = DistanceMatrix.n_cols;				// size of chromosomes
+  
   MTRand rng(rngSeed);				// initialize the random number generator
   
-  // reading input file with adjacency matrix
-  // Formato: n n dist(i,j)
-  std::ifstream myReadFile;
-  myReadFile.open(instanceFile);
-  if (!myReadFile) {
-    Rcpp::Rcout << "Nao consigo abrir arquivo " << std::endl;
-    return(-1);
-  }
+  MdpDecoder decoder(DistanceMatrix, m);			// initialize the decoder
   
-  // initialize the adjacency matrix
-  double t;
-  unsigned primeironumeroarquivo, segundonumeroarquivo;
-  
-  myReadFile >> primeironumeroarquivo;	
-  myReadFile >> segundonumeroarquivo;
-  
-  n = primeironumeroarquivo;     // size of chromosomes - initialize n
-  
-  while (myReadFile >> t){
-    dist.push_back (t);
-  }
   
   // initialize the BRKGA-based heuristic
   BRKGA< MdpDecoder, MTRand > algorithm(n, p, pe, pm, rhoe, decoder, rng, K, MAXT);
   
   unsigned generation = 0;	// current generation
-  const unsigned fitness = 0;
-  m = n*0.10;			// número de elementos do subconjunto de máxima diversidade
+  double lastfitness = 0;
+  double gensLoosing = 0;
+  
+  //m = n*0.10;			// número de elementos do subconjunto de máxima diversidade
   clock_t start_t, end_t;
   
   //verificar se esta estagnado, se estiver por X_INTVL iteracoes, reestart.
   start_t = clock();
-  double BestLocalSearchFitness=0;
-  std::vector<double> BestLocalSearchChromosome(n);
-  std::list< unsigned > BestSolution;
+  double BestLocalSearchFitness = 0;
+  unsigned relevantGeneration = 0;	// last relevant generation: best updated or reset called
+  unsigned ImprovedSol = 0;
+  std::vector< unsigned > BestSolution;
+  std::vector< double > BestChromosome(n);
+  Rcpp::List search;
+  
+  double loopTime = 0;
   do {
+    gensLoosing++;
     algorithm.evolve();	// evolve the population for one generation
-    Rcpp::Rcout << "Best solution generation " << generation << " found has objective value = " << -algorithm.getBestFitness() << std::endl;
+    Rcpp::Rcout << "Best solution generation " << generation << " found has objective value = " << algorithm.getBestFitness() << std::endl;
     
     // Local Search
-    Rcpp::List search = localSearch(algorithm.getBestChromosome());
-    
-    double LocalSearchFitness = search["LocalSearchFitness"];
-    std::list< unsigned > solution = search["Solution"];
-    if (LocalSearchFitness > BestLocalSearchFitness) {
-      BestLocalSearchChromosome = Rcpp::as<std::vector<double>>(search["Chromosome"]);
-      BestLocalSearchFitness = LocalSearchFitness;
-      BestSolution = solution;
-      algorithm.exchangeAlleles(search["Chromosome"], 0, n-1, search["LocalSearchFitness"]);
-      Rcpp::Rcout << "Best solution generation " << generation << " After exchange = " << -algorithm.getBestFitness() << std::endl;
+    if (algorithm.getBestFitness() != lastfitness){
+      search = localSearch(algorithm.getBestChromosome(), (double)algorithm.getBestFitness(), DistanceMatrix, m);
+      std::vector<double> cr = Rcpp::as<std::vector<double>>(search["Chromosome"]);
+      if (method == 2) 
+        algorithm.exchangeAlleles(search["Chromosome"], 0, n-1, search["lsFitness"]);
+      //std::list< unsigned > solution = search["Solution"];
+      if ((double)search["lsFitness"] < BestLocalSearchFitness) {
+        BestLocalSearchFitness = search["lsFitness"];
+        BestSolution = Rcpp::as<std::vector<unsigned>>(search["Solution"]);
+        BestChromosome = Rcpp::as<std::vector<double>>(search["Chromosome"]);
+        ImprovedSol++;
+        gensLoosing = 0;
+        relevantGeneration = generation;
+        //Rcpp::Rcout << "\n Inserting best of local search in population\n\n";
+      }
       
     }
     
-    Rcpp::Rcout << "Local Search  of generation :" << LocalSearchFitness << std::endl;
+    Rcpp::Rcout << "Local Search  of generation : " << BestLocalSearchFitness << "*********" << std::endl;
     Rcpp::Rcout << "--------------" << std::endl;
-    Rcpp::Rcout << "--------------" << std::endl;
+    
+    lastfitness = algorithm.getBestFitness();
+    
+    //  Evolution strategy: restart
+    if(generation - relevantGeneration > RESET_AFTER) {
+      algorithm.reset();	// restart the algorithm with random keys
+      relevantGeneration = generation;
+      
+      Rcpp::Rcout << "\t" << generation << ") Reset at generation "
+                  << generation << std::endl;
+    }
     
     if((++generation) % X_INTVL == 0) {
       algorithm.exchangeElite(X_NUMBER);	// exchange top individuals
     }
     end_t = clock();
+    loopTime = (double)(difftime(end_t,start_t)/CLOCKS_PER_SEC);
     //} while (generation < MAX_GENS);
-  } while ((double)(difftime(end_t,start_t)/CLOCKS_PER_SEC) <= MAX_TIME);
+  } while ((loopTime <= MAX_TIME) && (gensLoosing <= MAX_GENS));
   
-  std::vector<double> bestChromosome(algorithm.getBestChromosome());
-  
-  std::vector< std::pair< double, unsigned > > bestRanking(bestChromosome.size());
-  
-  // ranking is the chromosome and vector of indices [0, 1, ..., n-1]
-  for(unsigned i = 0; i < bestChromosome.size(); ++i) {
-    bestRanking[i] = std::pair< double, unsigned >(bestChromosome[i], i);
-  }
-  
-  // Here we sort 'permutation', which will then produce a permutation of [n] in pair::second:
-  std::sort(bestRanking.begin(), bestRanking.end());
-  
-  // permutation[i].second is in {0, ..., n - 1}; a permutation can be obtained as follows
-  std::vector< unsigned > bestPermutation;
-  for(auto i = bestRanking.begin();
-      i != bestRanking.begin()+m; ++i) {
-    bestPermutation.push_back(i->second);
-  }
-  
-  
-  
-  Rcpp::Rcout << "Best solution found has objective value = " << -algorithm.getBestFitness() << "em " << difftime(end_t,start_t)/CLOCKS_PER_SEC << " segundos" << std::endl;
-  Rcpp::Rcout << "Best local search solution found has objective value = " << BestLocalSearchFitness << std::endl;
+  Rcpp::Rcout << "Best solution found has objective value = " << algorithm.getBestFitness() << "em " << difftime(end_t,start_t)/CLOCKS_PER_SEC << " segundos" << std::endl << std::endl;
   Rcpp::List rst = Rcpp::List::create(
-    Rcpp::Named("lsTour") = BestSolution,
-    Rcpp::Named("Tour") = bestPermutation,
-    Rcpp::Named("Chromosome") = algorithm.getBestChromosome(),
+    Rcpp::Named("LSChr") = BestChromosome,
+    Rcpp::Named("BKChr") = algorithm.getBestChromosome(),
+    Rcpp::Named("Tour") = BestSolution,
     Rcpp::Named("Fitness") = algorithm.getBestFitness(),
     Rcpp::Named("lsFitness") = BestLocalSearchFitness,
-    Rcpp::Named("lsChromosome") = BestLocalSearchChromosome);
+    Rcpp::Named("Generations Number") = generation,
+    Rcpp::Named("Improvement Number") = ImprovedSol,
+    Rcpp::Named("Duration") = loopTime);
   
   return rst;
   }

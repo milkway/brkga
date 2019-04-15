@@ -300,7 +300,7 @@ void BRKGA< Decoder, RNG >::exchangeAlleles(const std::vector< double >& BestOfL
 #endif
   /// dest = p - 1;	// Last chromosome of i (will be updated below)
   std::copy(BestOfLS.begin(), BestOfLS.end(), current[k_K]->getChromosome(dest).begin());
-  current[k_K]->fitness[dest].first = -Ftnss;
+  current[k_K]->fitness[dest].first = Ftnss;
   for(int j = 0; j < int(K); ++j) { current[j]->sortFitness(); }
 }
 
