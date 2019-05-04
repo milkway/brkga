@@ -1,8 +1,5 @@
 
 
-MDGa1n500m50 <- MDGa1n500m50[1:500,1:500]
-
-write_rds(MDGa1n500m50, path = "inst/extdata/MDGa1n500m50.rds")
 
 library(RcppXPtrUtils)
 
@@ -59,4 +56,74 @@ c("Ackleys", "AluffiPentini", "BeckerLago",
   "Schaffer2", "Schubert", "Schwefel",
   "Shekel10", "Shekel5", "Shekel7",
   "Shekelfox5", "Wood", "Zeldasine10",
-  "Zeldasine20").
+  "Zeldasine20")
+
+
+
+library(tidyverse)
+result <- readr::read_rds("~/Dropbox/resultado.rds")
+result %>%  filter(LSEr >= 0)
+tour <- result %>% filter(Seed == 2651) %>% select(Tour) %>% unnest() %>% unlist(use.names = FALSE)
+
+write.table(result$Tour[3] %>% unlist(),  sep = " ", file = "~/Dropbox/Trabalhos/pdm/PDM/calcularBeneficio/tour_mdg_a2.txt", row.names = FALSE, col.names = FALSE)
+
+write.table(M %>% unlist(),  sep = " ", file = "~/Dropbox/Trabalhos/pdm/PDM/calcularBeneficio/tour_mdg_a3.txt", row.names = FALSE, col.names = FALSE)
+
+write.table(res$PDMSolution,  sep = " ", file = "~/Dropbox/Trabalhos/pdm/PDM/calcularBeneficio/tour_mdg_a1.txt", row.names = FALSE, col.names = FALSE)
+
+write.table(M,  sep = " ", file = "~/Dropbox/Trabalhos/pdm/PDM/calcularBeneficio/tour_mdg_a3.txt", row.names = FALSE, col.names = FALSE)
+
+
+data_files <- tibble(
+  File = list.files("~/Downloads/MDP/", recursive = TRUE),
+  Path = paste0("~/Downloads/MDP/", File),
+  Name = str_sub(File, start = 7)) %>% 
+  filter(!str_detect(File, "~")) %>% 
+  left_join(lista, by = "Name") %>% 
+  mutate(Number = as.integer(str_remove(str_sub(Instance, 7, 8), "_"))) %>% 
+  arrange(SubType, Number)
+  
+path_name
+textfile <- paste0("~/Downloads/MDP/", list.files("~/Downloads/MDP/", recursive = TRUE))
+
+#textfile <- system.file("extdata", package = "brkga",  "conv_MDG-a_5_n500_m50.txt")
+teste <- read.table(file = textfile, header = FALSE, sep = " ", skip = 1L) %>% filter(row_number() <= 500) %>% select(1:500)
+
+for(i in 1:nrow(data_files)){
+  cat("\nProcessing file ", i, " of 100")
+  write_rds(path = paste0("inst/extdata/", data_files$Type[i], ".", data_files$Number[i], ".", 
+                          data_files$SubType[i], ".n", 
+                          data_files$n[i], "m", 
+                          data_files$m[i],".rds"), 
+            read.table(file = data_files$Path[i], header = FALSE, sep = " ", skip = 1L) %>% 
+              filter(row_number() <= data_files$n[i]) %>% 
+              select(1:data_files$n[i]) %>% as.matrix(), compress = "xz")
+}
+
+#assign(paste0(".mdg", ".a.n", 500, "m", 50), read.table(file = textfile, header = FALSE, sep = " ", skip = 1L) %>% filter(row_number() <= 500) %>% select(1:500) %>% as.matrix())
+#dist_matrix <- read_rds(paste0("inst/extdata/", lista$Type[i], ".", i, ".", lista$SubType[i], ".n", lista$n[i], "m", lista$m[i])) 
+library(brkga)
+lista <- read_rds(system.file("extdata", package = "brkga",  "mdplib.rds")) %>% 
+  mutate(Name = paste0("conv_", Instance), 
+         Type = str_sub(Name, 6,8), 
+         SubType = str_sub(Name, 10,10), 
+         n = as.integer(str_remove(str_extract(Name,pattern = "n\\d+"), pattern = "n")),
+         m = as.integer(str_remove(str_extract(Name,pattern = "m\\d+"), pattern = "m"))) %>% 
+  filter(Type == "MDG", SubType == "a")
+
+index = 3
+dist_matrix <- read_rds(system.file("extdata", package = "brkga",  paste0(lista$Type[index], ".", index, ".", lista$SubType[index], ".n", lista$n[index], "m", lista$m[index])))
+
+res <- brkga::mdp_brkga(DistanceMatrix = dist_matrix,
+                        m = lista$m[index],
+                        MAX_TIME = 10,
+                        method = 2,
+                        p = ceiling(.5*(lista$n[index])), 
+                        pe = .2, 
+                        pm = .2,
+                        rhoe = .75,
+                        MAXT=8, 
+                        K=3, 
+                        MAX_GENS = 150,
+                        RESET_AFTER = 100, 
+                        rngSeed = 265)
