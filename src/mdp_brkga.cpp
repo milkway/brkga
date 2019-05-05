@@ -54,70 +54,38 @@ std::set< unsigned > get_N(unsigned n, std::set< unsigned > M){
 }
 
 
-// Runs in \Theta(n \log n):
-Rcpp::List localSearch(const std::vector< double >& chromosome, double myFitness, const arma::mat& DistMat, unsigned m){
-  
-  std::vector< std::pair< double, unsigned > > ranking(chromosome.size());
-  
-  // ranking is the chromosome and vector of indices [0, 1, ..., n-1]
-  for(unsigned i = 0; i < chromosome.size(); ++i) {
-    ranking[i] = std::pair< double, unsigned >(chromosome[i], i);
-  }
-  
-  // Here we sort 'permutation', which will then produce a permutation of [n] in pair::second:
-  std::sort(ranking.begin(), ranking.end());
-  std::set< unsigned> M;
-  for(auto it = ranking.begin(); it != ranking.begin() + m; ++it) 
-    M.insert((*it).second);
-  std::sort(ranking.begin(),ranking.end(), compare);
-  
-  // Set N-M
-  std::set< unsigned > N_M;
-  for(unsigned i = 0; i < chromosome.size(); i++){
-    auto it = M.find(i);
-    if (it == M.end()) N_M.insert(i);
-  }
 
-  double LocalSearchFitness = myFitness;
 
-  //First Improvement
-  double delta_Z = 0;
-  for(auto it_m = M.begin(); it_m != M.end(); ++it_m) {
-    for(auto it_n_m = N_M.begin(); it_n_m != N_M.end(); ++it_n_m) {
-      // calculando o delta z (vizinho - melhor_Solucao)
-      delta_Z = 0;
-      Rcpp::checkUserInterrupt();
-      for(auto item = M.begin(); item != M.end(); item++) {
-        if (*item != *it_m) 
-          delta_Z += -DistMat(*it_m, *item) + DistMat(*it_n_m, *item);
-      }
-      if (delta_Z > 0) {
-        M.insert(*it_n_m);
-        double aux = ranking[*it_m].first;
-        ranking[*it_m].first = ranking[*it_n_m].first;
-        ranking[*it_n_m].first = aux;
-        N_M.insert(*it_m);
-        M.erase(*it_m);
-        N_M.erase(*it_n_m);
-        
-        // PENSAR: Modificar o cromossomo com a sol da busca
-        LocalSearchFitness -= delta_Z;
-        it_m = M.begin();
-        it_n_m = N_M.begin();
-      } 
+//' Get fitness from tour
+//' @details Get fitness using the tour, m and distance matrix
+//' @param \code{Tour} Set of tour's nodes.
+//' @param \code{Distances} Distance matrix
+//' @return A double value representing the chromosome fitness
+//' @export 
+// [[Rcpp::export]]
+double getTourFitness(std::vector<unsigned>& Tour, const arma::mat& Distances){
+  double Fitness = 0;
+  for (auto i = Tour.begin(); i != Tour.end(); ++i) {
+    for (auto j = i; j != Tour.end(); ++j) {
+      Fitness += Distances(*i, *j);
     }
   }
-  
-  std::vector<double> chrm(chromosome.size());
-  for(auto it = ranking.begin(); it != ranking.end(); ++it) 
-    chrm[it - ranking.begin()] = (*it).first;
-  
-  Rcpp::List rst = Rcpp::List::create(
-    Rcpp::Named("Chromosome") = chrm,
-    Rcpp::Named("Solution") = M,
-    Rcpp::Named("lsFitness") = LocalSearchFitness);
-  
-  return rst;
+  return(Fitness);
+}
+
+//' Get fitness from chromosome
+//' @details Get fitness using chromossome, m and distance matrix
+//' @param \code{chromosome} Chromosome
+//' @param \code{Distances} Distance matrix
+//' @param \code{m} Size of tour
+//' @return A double value representing the chromosome fitness
+//' @export 
+// [[Rcpp::export]]
+double getChromosomeFitness(const std::vector< double >& chromosome, const arma::mat& Distances, unsigned m){
+  std::set< unsigned > M = get_M(chromosome, m);
+  std::vector<unsigned> Tour(M.begin(),M.end());
+  double Fitness = getTourFitness(Tour, Distances);
+  return(Fitness);
 }
   
   

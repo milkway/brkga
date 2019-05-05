@@ -6,6 +6,31 @@
 
 using namespace Rcpp;
 
+// getTourFitness
+double getTourFitness(std::vector<unsigned>& Tour, const arma::mat& Distances);
+RcppExport SEXP _brkga_getTourFitness(SEXP TourSEXP, SEXP DistancesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<unsigned>& >::type Tour(TourSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Distances(DistancesSEXP);
+    rcpp_result_gen = Rcpp::wrap(getTourFitness(Tour, Distances));
+    return rcpp_result_gen;
+END_RCPP
+}
+// getChromosomeFitness
+double getChromosomeFitness(const std::vector< double >& chromosome, const arma::mat& Distances, unsigned m);
+RcppExport SEXP _brkga_getChromosomeFitness(SEXP chromosomeSEXP, SEXP DistancesSEXP, SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector< double >& >::type chromosome(chromosomeSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Distances(DistancesSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type m(mSEXP);
+    rcpp_result_gen = Rcpp::wrap(getChromosomeFitness(chromosome, Distances, m));
+    return rcpp_result_gen;
+END_RCPP
+}
 // mdp_brkga
 Rcpp::List mdp_brkga(const arma::mat DistanceMatrix, const unsigned m, const unsigned method, const unsigned LS_INTERVAL, const unsigned MAX_TIME, const unsigned p, const double pe, const double pm, const double rhoe, const double lambda, const unsigned K, const unsigned THREADS, const unsigned X_INTVL, const unsigned X_NUMBER, const unsigned MAX_GENS, const unsigned RESET_AFTER, const bool verbose, const long unsigned rngSeed);
 RcppExport SEXP _brkga_mdp_brkga(SEXP DistanceMatrixSEXP, SEXP mSEXP, SEXP methodSEXP, SEXP LS_INTERVALSEXP, SEXP MAX_TIMESEXP, SEXP pSEXP, SEXP peSEXP, SEXP pmSEXP, SEXP rhoeSEXP, SEXP lambdaSEXP, SEXP KSEXP, SEXP THREADSSEXP, SEXP X_INTVLSEXP, SEXP X_NUMBERSEXP, SEXP MAX_GENSSEXP, SEXP RESET_AFTERSEXP, SEXP verboseSEXP, SEXP rngSeedSEXP) {
@@ -623,6 +648,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_brkga_getTourFitness", (DL_FUNC) &_brkga_getTourFitness, 2},
+    {"_brkga_getChromosomeFitness", (DL_FUNC) &_brkga_getChromosomeFitness, 3},
     {"_brkga_mdp_brkga", (DL_FUNC) &_brkga_mdp_brkga, 18},
     {"_brkga_nl_brkga", (DL_FUNC) &_brkga_nl_brkga, 14},
     {"_brkga_Ackleys", (DL_FUNC) &_brkga_Ackleys, 1},
