@@ -6,40 +6,31 @@
 
 using namespace Rcpp;
 
-// tsp_brkga
-Rcpp::List tsp_brkga(std::string instanceFile);
-RcppExport SEXP _brkga_tsp_brkga(SEXP instanceFileSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type instanceFile(instanceFileSEXP);
-    rcpp_result_gen = Rcpp::wrap(tsp_brkga(instanceFile));
-    return rcpp_result_gen;
-END_RCPP
-}
 // mdp_brkga
-Rcpp::List mdp_brkga(const arma::mat DistanceMatrix, const unsigned m, const unsigned method, const unsigned MAX_TIME, const unsigned p, const double pe, const double pm, const double rhoe, const unsigned K, const unsigned MAXT, const unsigned X_INTVL, const unsigned X_NUMBER, const unsigned MAX_GENS, const unsigned RESET_AFTER, const bool verbose, const long unsigned rngSeed);
-RcppExport SEXP _brkga_mdp_brkga(SEXP DistanceMatrixSEXP, SEXP mSEXP, SEXP methodSEXP, SEXP MAX_TIMESEXP, SEXP pSEXP, SEXP peSEXP, SEXP pmSEXP, SEXP rhoeSEXP, SEXP KSEXP, SEXP MAXTSEXP, SEXP X_INTVLSEXP, SEXP X_NUMBERSEXP, SEXP MAX_GENSSEXP, SEXP RESET_AFTERSEXP, SEXP verboseSEXP, SEXP rngSeedSEXP) {
+Rcpp::List mdp_brkga(const arma::mat DistanceMatrix, const unsigned m, const unsigned method, const unsigned LS_INTERVAL, const unsigned MAX_TIME, const unsigned p, const double pe, const double pm, const double rhoe, const double lambda, const unsigned K, const unsigned THREADS, const unsigned X_INTVL, const unsigned X_NUMBER, const unsigned MAX_GENS, const unsigned RESET_AFTER, const bool verbose, const long unsigned rngSeed);
+RcppExport SEXP _brkga_mdp_brkga(SEXP DistanceMatrixSEXP, SEXP mSEXP, SEXP methodSEXP, SEXP LS_INTERVALSEXP, SEXP MAX_TIMESEXP, SEXP pSEXP, SEXP peSEXP, SEXP pmSEXP, SEXP rhoeSEXP, SEXP lambdaSEXP, SEXP KSEXP, SEXP THREADSSEXP, SEXP X_INTVLSEXP, SEXP X_NUMBERSEXP, SEXP MAX_GENSSEXP, SEXP RESET_AFTERSEXP, SEXP verboseSEXP, SEXP rngSeedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::mat >::type DistanceMatrix(DistanceMatrixSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type m(mSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type LS_INTERVAL(LS_INTERVALSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type MAX_TIME(MAX_TIMESEXP);
     Rcpp::traits::input_parameter< const unsigned >::type p(pSEXP);
     Rcpp::traits::input_parameter< const double >::type pe(peSEXP);
     Rcpp::traits::input_parameter< const double >::type pm(pmSEXP);
     Rcpp::traits::input_parameter< const double >::type rhoe(rhoeSEXP);
+    Rcpp::traits::input_parameter< const double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type K(KSEXP);
-    Rcpp::traits::input_parameter< const unsigned >::type MAXT(MAXTSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type THREADS(THREADSSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type X_INTVL(X_INTVLSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type X_NUMBER(X_NUMBERSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type MAX_GENS(MAX_GENSSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type RESET_AFTER(RESET_AFTERSEXP);
     Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< const long unsigned >::type rngSeed(rngSeedSEXP);
-    rcpp_result_gen = Rcpp::wrap(mdp_brkga(DistanceMatrix, m, method, MAX_TIME, p, pe, pm, rhoe, K, MAXT, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed));
+    rcpp_result_gen = Rcpp::wrap(mdp_brkga(DistanceMatrix, m, method, LS_INTERVAL, MAX_TIME, p, pe, pm, rhoe, lambda, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -619,10 +610,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tsp_brkga
+Rcpp::List tsp_brkga(std::string instanceFile);
+RcppExport SEXP _brkga_tsp_brkga(SEXP instanceFileSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type instanceFile(instanceFileSEXP);
+    rcpp_result_gen = Rcpp::wrap(tsp_brkga(instanceFile));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_brkga_tsp_brkga", (DL_FUNC) &_brkga_tsp_brkga, 1},
-    {"_brkga_mdp_brkga", (DL_FUNC) &_brkga_mdp_brkga, 16},
+    {"_brkga_mdp_brkga", (DL_FUNC) &_brkga_mdp_brkga, 18},
     {"_brkga_nl_brkga", (DL_FUNC) &_brkga_nl_brkga, 14},
     {"_brkga_Ackleys", (DL_FUNC) &_brkga_Ackleys, 1},
     {"_brkga_AluffiPentini", (DL_FUNC) &_brkga_AluffiPentini, 1},
@@ -672,6 +673,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_brkga_Zeldasine", (DL_FUNC) &_brkga_Zeldasine, 3},
     {"_brkga_reg_beta", (DL_FUNC) &_brkga_reg_beta, 2},
     {"_brkga_reg_brkga", (DL_FUNC) &_brkga_reg_brkga, 15},
+    {"_brkga_tsp_brkga", (DL_FUNC) &_brkga_tsp_brkga, 1},
     {NULL, NULL, 0}
 };
 
