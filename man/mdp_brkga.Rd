@@ -4,39 +4,42 @@
 \alias{mdp_brkga}
 \title{Execute a MDP solution search using BRKGA}
 \usage{
-mdp_brkga(instanceFile, MAX_TIME = 10L, p = 500L, pe = 0.2,
-  pm = 0.1, rhoe = 0.7, K = 1L, MAXT = 8L, X_INTVL = 100L,
-  X_NUMBER = 2L, MAX_GENS = 1000L, SEM_MELHORA = 0L,
+mdp_brkga(DistanceMatrix, m, method = 0L, LS_INTERVAL = 10L,
+  MAX_TIME = 10L, p = 500L, pe = 0.2, pm = 0.1, rhoe = 0.7,
+  lambda = 0.01, K = 3L, THREADS = 8L, X_INTVL = 100L,
+  X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L,
   verbose = FALSE, rngSeed = 0L)
 }
 \arguments{
-\item{instanceFile}{Path to file containing the instance}
+\item{\code{DistanceMatrix}}{distances matrix of the instance}
 
-\item{MAX_TIME}{Max time of execution in seconds}
+\item{\code{m}}{Number of elements selected (m <= n)}
 
-\item{p}{Size of population}
+\item{\code{MAX_TIME}}{Max time of execution in seconds}
 
-\item{pe}{Fraction of population to be the elite-set}
+\item{\code{p}}{Size of population}
 
-\item{pm}{Fraction of population to be replaced by mutants}
+\item{\code{pe}}{Fraction of population to be the elite-set}
 
-\item{rhoe}{Frobability that offspring inherit an allele from elite parent}
+\item{\code{pm}}{Fraction of population to be replaced by mutants}
 
-\item{K}{number of independent populations}
+\item{\code{rhoe}}{Frobability that offspring inherit an allele from elite parent}
 
-\item{MAXT}{number of threads for parallel decoding}
+\item{\code{lambda}}{probability update population with local search}
 
-\item{X_INTVL}{Exchange best individuals at every 100 generations}
+\item{\code{K}}{number of independent populations}
 
-\item{X_NUMBER}{Exchange top 2 best}
+\item{\code{THREADS}}{number of threads for parallel decoding}
 
-\item{MAX_GENS}{Max number of generations}
+\item{\code{X_INTVL}}{Exchange best individuals at every 100 generations}
 
-\item{SEM_MELHORA}{Pergunte para Geiza}
+\item{\code{X_NUMBER}}{Exchange top 2 best}
 
-\item{verbose}{Level of output information}
+\item{\code{MAX_GENS}}{Max number of generations}
 
-\item{rngSeed}{Seed to the random number generator}
+\item{\code{verbose}}{Level of output information}
+
+\item{\code{rngSeed}}{Seed to the random number generator}
 }
 \value{
 A numeric vector of random values
