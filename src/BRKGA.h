@@ -292,16 +292,14 @@ void BRKGA< Decoder, RNG >::exchangeElite(unsigned M) {
 }
 
 template< class Decoder, class RNG >
-void BRKGA< Decoder, RNG >::exchangeAlleles(const std::vector< double >& BestOfLS, unsigned k_K, unsigned dest, double Ftnss) {
+void BRKGA< Decoder, RNG >::exchangeAlleles(const std::vector< double >& BestOfLS, unsigned k_, unsigned dest, double Ftnss) {
 #ifdef RANGECHECK
   if(dest >= p) { Rcpp::stop("dest cannot be zero or >= p."); }
-  if(k_K >= k_K) { Rcpp::stop("k_K_M cannot be zero or >= K."); }
-  if(Ftnss > 1 || Ftnss < 0) { Rcpp::stop("Ftnss must be in [0,1] interval"); }
+  if(k_ >= K) { Rcpp::stop("population cannot be zero or >= K."); }
 #endif
-  /// dest = p - 1;	// Last chromosome of i (will be updated below)
-  std::copy(BestOfLS.begin(), BestOfLS.end(), current[k_K]->getChromosome(dest).begin());
-  current[k_K]->fitness[dest].first = Ftnss;
-  for(int j = 0; j < int(K); ++j) { current[j]->sortFitness(); }
+  std::copy(BestOfLS.begin(), BestOfLS.end(), current[k_]->getChromosome(dest).begin());
+  current[k_]->fitness[dest].first = Ftnss;
+  for(unsigned j = 0; j < K; ++j) { current[j]->sortFitness(); }
 }
 
 

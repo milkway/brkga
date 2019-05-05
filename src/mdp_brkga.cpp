@@ -174,7 +174,7 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
   std::mt19937::result_type seed_u = rngSeed + 3;
   auto K_rand = std::bind(std::uniform_int_distribution<unsigned>(0,K-1),
                           std::mt19937(seed_K));
-  auto n_rand = std::bind(std::uniform_int_distribution<unsigned>(0,n-1),
+  auto n_rand = std::bind(std::uniform_int_distribution<unsigned>(0,p-1),
                           std::mt19937(seed_n));
   auto u_rand = std::bind(std::uniform_real_distribution<double>(0,1),
                              std::mt19937(seed_u));
@@ -199,7 +199,7 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
   unsigned ImprovedSol = 0;
   std::set< unsigned > BestSolution;
   std::vector< double > BestChromosome(n);
-  Rcpp::List search;
+  
   Rprintf("+--------------+--------------+------------+---------+----------+\n");
   Rprintf("| Best Fitness | Local Search | Generation | Loosing | Duration |\n");
   double loopTime = 0;
@@ -207,10 +207,10 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
     gensLoosing++;
     algorithm.evolve();	// evolve the population for one generation
 
-    
     // New Local Search
-    if (generation % LS_INTERVAL == 0){
-      std::vector<double> chromosome = algorithm.getBestChromosome();
+    if ((generation % LS_INTERVAL == 0) & (method == 1)){
+      std::vector<double> chromosome(n);
+      std::copy(algorithm.getBestChromosome().begin(), algorithm.getBestChromosome().end(), chromosome.begin());
       double LocalSearchFitness = (double)algorithm.getBestFitness();
       std::vector< std::pair< double, unsigned > > ranking(n);
       // ranking is the chromosome and vector of indices [0, 1, ..., n-1]
@@ -218,33 +218,32 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
         ranking[i] = std::pair< double, unsigned >(chromosome[i], i);
       }
       
-      std::set< unsigned > M = get_M(algorithm.getBestChromosome(), m);
+      std::set< unsigned > M = get_M(chromosome, m);
       std::set< unsigned > N = get_N(n, M);
       
       //Look for improvements and update a population
-      //instance <- read_rds("inst/extdata/MDG.1.a.n500m50.rds")
       double delta_Z = 0;
       for(auto it_m = M.begin(); it_m != M.end(); ++it_m) {
-        for(auto it_n_m = N.begin(); it_n_m != N.end(); ++it_n_m) {
+        for(auto it_n = N.begin(); it_n != N.end(); ++it_n) {
           // calculando o delta z (vizinho - melhor_Solucao)
           delta_Z = 0;
           Rcpp::checkUserInterrupt();
           for(auto item = M.begin(); item != M.end(); item++) {
             if (*item != *it_m) 
-              delta_Z += -DistanceMatrix(*it_m, *item) + DistanceMatrix(*it_n_m, *item);
+              delta_Z += -DistanceMatrix(*it_m, *item) + DistanceMatrix(*it_n, *item);
           }
           if (delta_Z > 0) {
-            M.insert(*it_n_m);
+            M.insert(*it_n);
             double aux = chromosome[*it_m];
-            chromosome[*it_m] = chromosome[*it_n_m];
-            chromosome[*it_n_m] = aux;
+            chromosome[*it_m] = chromosome[*it_n];
+            chromosome[*it_n] = aux;
             N.insert(*it_m);
             M.erase(*it_m);
-            N.erase(*it_n_m);
+            N.erase(*it_n);
             //Update Fitness
             LocalSearchFitness -= delta_Z;
             it_m = M.begin();
-            it_n_m = N.begin();
+            it_n = N.begin();
             // Update best chromossome
             if (LocalSearchFitness < BestLocalSearchFitness){
               BestChromosome = chromosome;
@@ -252,12 +251,13 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
               BestSolution = M;
               gensLoosing = 0;
             }
-            //result <- mdp_brkga(DistanceMatrix = instance, m = 50, K = 3, MAX_TIME = 10, rngSeed = as.integer(Sys.time()))
-            if (u_rand() < lambda) 
+            if (u_rand() < lambda){
+              //Rprintf("\nK rand: %i, n rand: % i\n", K_rand(), n_rand());
               algorithm.exchangeAlleles(chromosome, K_rand(), n_rand(), LocalSearchFitness);
-            Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %8.0f |", \
-                    algorithm.getBestFitness(),                   \
-                    BestLocalSearchFitness,                       \
+            } 
+            Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.0fs |", \
+                    -algorithm.getBestFitness(),                   \
+                    -BestLocalSearchFitness,                       \
                     generation,                                   \
                     gensLoosing,                                  \
                     (double)(difftime(clock(),start_t)/CLOCKS_PER_SEC));
@@ -284,9 +284,9 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
     }
     end_t = clock();
     loopTime = (double)(difftime(end_t,start_t)/CLOCKS_PER_SEC);
-    Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %8.0f |", \
-            algorithm.getBestFitness(),                   \
-            BestLocalSearchFitness,                       \
+    Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.0fs |", \
+            -algorithm.getBestFitness(),                   \
+            -BestLocalSearchFitness,                       \
             generation,                                   \
             gensLoosing,                                  \
             (double)(difftime(clock(),start_t)/CLOCKS_PER_SEC));
@@ -297,8 +297,8 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
     Rcpp::Named("LSChr") = BestChromosome,
     Rcpp::Named("BKChr") = algorithm.getBestChromosome(),
     Rcpp::Named("Tour") = BestSolution,
-    Rcpp::Named("LSFitness") = algorithm.getBestFitness(),
-    Rcpp::Named("BKFitness") = BestLocalSearchFitness,
+    Rcpp::Named("LSFitness") = -algorithm.getBestFitness(),
+    Rcpp::Named("BKFitness") = -BestLocalSearchFitness,
     Rcpp::Named("Generations Number") = generation,
     Rcpp::Named("Improvement Number") = ImprovedSol,
     Rcpp::Named("Duration") = loopTime);
