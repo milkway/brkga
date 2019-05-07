@@ -3,9 +3,6 @@
 // RcppArmadillo so that the build process will know what to do
 //
 // [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::depends(RcppProgress)]]
-#include <progress.hpp>
-#include <progress_bar.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -162,6 +159,7 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
   
   //verificar se esta estagnado, se estiver por X_INTVL iteracoes, reestart.
   start_t = clock();
+  double time_elapsed = 0;
   double BestLocalSearchFitness = 0;
   unsigned relevantGeneration = 0;	// last relevant generation: best updated or reset called
   unsigned ImprovedSol = 0;
@@ -223,15 +221,18 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
               //Rprintf("\nK rand: %i, n rand: % i\n", K_rand(), n_rand());
               algorithm.exchangeAlleles(chromosome, K_rand(), n_rand(), LocalSearchFitness);
             } 
+            time_elapsed = (double)(difftime(clock(),start_t)/CLOCKS_PER_SEC);
             Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.0fs |", \
                     -algorithm.getBestFitness(),                   \
                     -BestLocalSearchFitness,                       \
                     generation,                                   \
                     gensLoosing,                                  \
-                    (double)(difftime(clock(),start_t)/CLOCKS_PER_SEC));
+                    time_elapsed);
             Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
           } 
+          if (time_elapsed > MAX_TIME) break;
         }
+        if (time_elapsed > MAX_TIME) break;
       }
     }
     if (lastLSfitness < BestLocalSearchFitness){      
