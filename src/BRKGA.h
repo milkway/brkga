@@ -141,6 +141,12 @@ public:
 	const std::vector< double >& getBestChromosome() const;
 
 	/**
+	 * Returns the chromosome with best fitness so far in population k
+	 */
+	const std::vector< double >& getBestPopulationChromosome(unsigned k) const;
+	
+	
+	/**
 	 * Returns the best fitness found so far among all populations
 	 */
 	double getBestFitness() const;
@@ -241,6 +247,12 @@ const std::vector< double >& BRKGA< Decoder, RNG >::getBestChromosome() const {
 	}
 
 	return current[bestK]->getChromosome(0);	// The top one :-)
+}
+
+
+template< class Decoder, class RNG >
+const std::vector< double >& BRKGA< Decoder, RNG >::getBestPopulationChromosome(unsigned k) const {
+  return current[k]->getChromosome(0);	// The top one :-)
 }
 
 template< class Decoder, class RNG >
