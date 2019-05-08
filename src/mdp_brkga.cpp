@@ -3,9 +3,9 @@
 
 #include <omp.h>
 // [[Rcpp::plugins(openmp)]]
-//// [[Rcpp::depends(RcppProgress)]]
-//#include <progress.hpp>
-//#include <progress_bar.hpp>
+// [[Rcpp::depends(RcppProgress)]]
+#include <progress.hpp>
+#include <progress_bar.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -95,6 +95,8 @@ double getChromosomeFitness(const std::vector< double >& chromosome, const arma:
 //'  aqui.
 //' @param \code{DistanceMatrix} distances matrix of the instance 
 //' @param \code{m} Number of elements selected (m <= n)
+//' @param \code{LS_INTVL} Generations between local searches
+//' @param \code{GEN_INTVL} Generations in each evolution;
 //' @param \code{MAX_TIME}  Max time of execution in seconds
 //' @param \code{p}  Size of population
 //' @param \code{pe} Fraction of population to be the elite-set
@@ -116,7 +118,7 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
                      const unsigned                 m,   // Number of elements selected (m <= n)
                      const unsigned       method =  0,   // 0: BRKGA; 1: BRKGA + LS; 2: BRKGA(LS) 
                      const unsigned     LS_INTVL =  5,  // Generations between local searches 
-                     const unsigned    GEN_INTVL =  5,  // Generations in each evolve;                      
+                     const unsigned    GEN_INTVL =  5,  // Generations in each evolution;                      
                      const unsigned     MAX_TIME = 10,	 // run for 10 seconds
                      const unsigned            p = 500,	 // size of population
                      const double             pe = 0.20, // fraction of population to be the elite-set
@@ -160,10 +162,13 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
   int gensLoosing = 0;
   
   //m = n*0.10;			// número de elementos do subconjunto de máxima diversidade
-  clock_t start_t, end_t;
+  //clock_t start_t, end_t;
+  
+  // Timing using chrono library
+  auto start = std::chrono::steady_clock::now();
+  std::chrono::duration<double> diff;
   
   //verificar se esta estagnado, se estiver por X_INTVL iteracoes, reestart.
-  start_t = clock();
   double time_elapsed = 0;
   double BestLocalSearchFitness = 0;
   unsigned relevantGeneration = 0;	// last relevant generation: best updated or reset called
@@ -226,8 +231,10 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
               //Rprintf("\nK rand: %i, n rand: % i\n", K_rand(), n_rand());
               algorithm.exchangeAlleles(chromosome, K_rand(), n_rand(), LocalSearchFitness);
             } 
-            time_elapsed = (double)(difftime(clock(),start_t)/CLOCKS_PER_SEC);
-            Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.0fs |", \
+            auto time = std::chrono::steady_clock::now();
+            diff = time - start;
+            time_elapsed = std::chrono::duration <double, std::milli> (diff).count()/1000;
+            Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %6.1fs |", \
                     -algorithm.getBestFitness(),                   \
                     -BestLocalSearchFitness,                       \
                     generation,                                   \
@@ -256,14 +263,15 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
     if((generation) % X_INTVL == 0) {
       algorithm.exchangeElite(X_NUMBER);	// exchange top individuals
     }
-    end_t = clock();
-    loopTime = (double)(difftime(end_t,start_t)/CLOCKS_PER_SEC);
-    Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.0fs |", \
+    auto time = std::chrono::steady_clock::now();
+    diff = time - start;
+    loopTime = std::chrono::duration <double, std::milli> (diff).count()/1000;
+    Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %6.1fs |", \
             -algorithm.getBestFitness(),                   \
             -BestLocalSearchFitness,                       \
             generation,                                   \
             gensLoosing,                                  \
-            (double)(difftime(clock(),start_t)/CLOCKS_PER_SEC));
+            loopTime);
     Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
   } while ((loopTime <= MAX_TIME) && (gensLoosing <= MAX_GENS));
   Rprintf("\n\nThis is the end. The Doors.\n");
@@ -307,7 +315,8 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
 Rcpp::List mdp_brkgals(const arma::mat   DistanceMatrix,  
                      const unsigned                 m,   // Number of elements selected (m <= n)
                      const unsigned       method =  0,   // 0: BRKGA; 1: BRKGA + LS; 2: BRKGA(LS) 
-                     const unsigned  LS_INTERVAL = 10,  // Generations between local searches 
+                     const unsigned     LS_INTVL = 10,   // Generations between local searches 
+                     const unsigned    GEN_INTVL = 5,    // Interval between Generations                      
                      const unsigned     MAX_TIME = 10,	 // run for 10 seconds
                      const unsigned            p = 500,	 // size of population
                      const double             pe = 0.20, // fraction of population to be the elite-set
@@ -326,7 +335,7 @@ Rcpp::List mdp_brkgals(const arma::mat   DistanceMatrix,
 
   if ( THREADS > 0 )
     omp_set_num_threads( THREADS );
-  Rprintf("\nNumber of threads=%i\n\n\n", omp_get_max_threads());
+  Rprintf("\nNumber of threads=%i\n", omp_get_max_threads());
 
 
   if (DistanceMatrix.n_cols != DistanceMatrix.n_rows) Rcpp::stop("Distance matrix must be square!");
@@ -372,10 +381,10 @@ Rcpp::List mdp_brkgals(const arma::mat   DistanceMatrix,
   do {
     
     gensLoosing++;
-    algorithm.evolve();	// evolve the population for one generation
+    algorithm.evolve(GEN_INTVL);	// evolve the population for one generation
     
-    if ((generation % LS_INTERVAL == 0) & (method == 1)){
-      
+    if ((generation % LS_INTVL == 0) & (method == 1)){
+      Progress p(1, false); // create the progress monitor
       arma::umat M(m, K, arma::fill::zeros);
       arma::umat BestTour(m, K, arma::fill::zeros);
       arma::umat N(n - m, K, arma::fill::zeros);
@@ -431,10 +440,12 @@ Rcpp::List mdp_brkgals(const arma::mat   DistanceMatrix,
               auto time = std::chrono::steady_clock::now();
               diff = time - start;
               if (std::chrono::duration <double, std::milli> (diff).count()/1000 > MAX_TIME)
-                break;
+                break; // Get out of here!
+              if (p.is_aborted()) break; // Get out of here!
             }
             if (std::chrono::duration <double, std::milli> (diff).count()/1000 > MAX_TIME)
-              break;
+              break; // Get out of here!
+            if (p.is_aborted()) break; // Get out of here!
           }
           K_fitness(k_) = BestLocalSearchFitness;          
       }

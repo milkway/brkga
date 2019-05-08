@@ -27,6 +27,8 @@ getChromosomeFitness <- function(chromosome, Distances, m) {
 #'  aqui.
 #' @param \code{DistanceMatrix} distances matrix of the instance 
 #' @param \code{m} Number of elements selected (m <= n)
+#' @param \code{LS_INTVL} Generations between local searches
+#' @param \code{GEN_INTVL} Generations in each evolution;
 #' @param \code{MAX_TIME}  Max time of execution in seconds
 #' @param \code{p}  Size of population
 #' @param \code{pe} Fraction of population to be the elite-set
@@ -68,8 +70,8 @@ mdp_brkga <- function(DistanceMatrix, m, method = 0L, LS_INTVL = 5L, GEN_INTVL =
 #' @return A numeric vector of random values
 #' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
 #' @export 
-mdp_brkgals <- function(DistanceMatrix, m, method = 0L, LS_INTERVAL = 10L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, lambda = 0.01, K = 3L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L, verbose = TRUE, rngSeed = 0L) {
-    .Call(`_brkga_mdp_brkgals`, DistanceMatrix, m, method, LS_INTERVAL, MAX_TIME, p, pe, pm, rhoe, lambda, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed)
+mdp_brkgals <- function(DistanceMatrix, m, method = 0L, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, lambda = 0.01, K = 3L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L, verbose = TRUE, rngSeed = 0L) {
+    .Call(`_brkga_mdp_brkgals`, DistanceMatrix, m, method, LS_INTVL, GEN_INTVL, MAX_TIME, p, pe, pm, rhoe, lambda, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed)
 }
 
 #' Execute a MDP solution search using BRKGA
