@@ -357,6 +357,7 @@ Rcpp::List mdp_brkgals(const arma::mat   DistanceMatrix,
   
   // Timing using chrono library
   auto start = std::chrono::steady_clock::now();
+  std::chrono::duration<double> diff;
   
   //verificar se esta estagnado, se estiver por X_INTVL iteracoes, reestart.
   unsigned relevantGeneration = 0;	// last relevant generation: best updated or reset called
@@ -426,8 +427,14 @@ Rcpp::List mdp_brkgals(const arma::mat   DistanceMatrix,
                   BestLocalSearchFitness = LocalSearchFitness;
                   BestTour.col(k_) = M.col(k_);
                 }
-              } 
+              }
+              auto time = std::chrono::steady_clock::now();
+              diff = time - start;
+              if (std::chrono::duration <double, std::milli> (diff).count()/1000 > MAX_TIME)
+                break;
             }
+            if (std::chrono::duration <double, std::milli> (diff).count()/1000 > MAX_TIME)
+              break;
           }
           K_fitness(k_) = BestLocalSearchFitness;          
       }
@@ -466,7 +473,7 @@ Rcpp::List mdp_brkgals(const arma::mat   DistanceMatrix,
     // end of timing
     auto end = std::chrono::steady_clock::now();
     // Store the time difference between start and end
-    auto diff = end - start;
+    diff = end - start;
     loopTime = std::chrono::duration <double, std::milli> (diff).count()/1000;
     if (verbose) {
       Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %6.1fs |", \
