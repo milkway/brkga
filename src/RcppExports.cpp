@@ -7,12 +7,12 @@
 using namespace Rcpp;
 
 // getTourFitness
-double getTourFitness(std::vector<unsigned>& Tour, const arma::mat& Distances);
+double getTourFitness(const std::vector<unsigned>& Tour, const arma::mat& Distances);
 RcppExport SEXP _brkga_getTourFitness(SEXP TourSEXP, SEXP DistancesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<unsigned>& >::type Tour(TourSEXP);
+    Rcpp::traits::input_parameter< const std::vector<unsigned>& >::type Tour(TourSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type Distances(DistancesSEXP);
     rcpp_result_gen = Rcpp::wrap(getTourFitness(Tour, Distances));
     return rcpp_result_gen;

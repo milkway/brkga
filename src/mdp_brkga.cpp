@@ -54,8 +54,22 @@ std::unordered_set< unsigned > get_N(unsigned n, std::unordered_set< unsigned > 
   return(N);
 }
 
-
-
+///' Get Alpha vector
+///' @details Get the distance from nodes to every node in M
+///' @param \code{Tour} Set of nodes;
+///' @param \code{Distances} Distance matrix
+///' @export
+/// [[Rcpp::export]]
+arma::vec getAlphaVector(const std::unordered_set<unsigned>& Tour, const arma::mat& Distances){
+  unsigned n = Distances.n_cols;
+  arma::vec alpha = arma::zeros<arma::vec>(n);
+  for(unsigned i = 0; i < n; i++){
+    auto it = Tour.find(i);
+    if (it != Tour.end())
+      alpha[i] = 1.0;
+  }
+  return(Distances*alpha);
+}
 
 //' Get fitness from tour
 //' @details Get fitness using the tour, m and distance matrix
@@ -64,7 +78,7 @@ std::unordered_set< unsigned > get_N(unsigned n, std::unordered_set< unsigned > 
 //' @return A double value representing the chromosome fitness
 //' @export 
 // [[Rcpp::export]]
-double getTourFitness(std::vector<unsigned>& Tour, const arma::mat& Distances){
+double getTourFitness(const std::vector<unsigned>& Tour, const arma::mat& Distances){
   double Fitness = 0;
   for (auto i = Tour.begin(); i != Tour.end(); ++i) {
     for (auto j = i; j != Tour.end(); ++j) {
@@ -184,7 +198,7 @@ Rcpp::List mdp_brkga(const arma::mat   DistanceMatrix,
     algorithm.evolve(GEN_INTVL);	// evolve the population for one generation
 
     // New Local Search
-    if ((generation % LS_INTVL == 0) & (method == 1)){
+    if ((generation % LS_INTVL == 0) && (method == 1)){
       std::vector<double> chromosome(n);
       std::copy(algorithm.getBestChromosome().begin(), algorithm.getBestChromosome().end(), chromosome.begin());
       double LocalSearchFitness = (double)algorithm.getBestFitness();
@@ -383,7 +397,7 @@ Rcpp::List mdp_brkgals(const arma::mat   DistanceMatrix,
     gensLoosing++;
     algorithm.evolve(GEN_INTVL);	// evolve the population for one generation
     
-    if ((generation % LS_INTVL == 0) & (method == 1)){
+    if ((generation % LS_INTVL == 0) && (method == 1)){
       Progress p(1, false); // create the progress monitor
       arma::umat M(m, K, arma::fill::zeros);
       arma::umat BestTour(m, K, arma::fill::zeros);
@@ -557,44 +571,34 @@ Rcpp::List mdp_brkgaus(const arma::mat   DistanceMatrix,
     omp_set_num_threads( THREADS );
   Rprintf("\nNumber of threads=%i\n", omp_get_max_threads());
   
-  
   if (DistanceMatrix.n_cols != DistanceMatrix.n_rows) Rcpp::stop("Distance matrix must be square!");
   unsigned n = DistanceMatrix.n_cols;				// size of chromosomes
   
   MTRand rng(rngSeed);				// initialize the random number generator
-  
-  // Rand generator for Pop and Allele
-  std::mt19937::result_type seed_K = rngSeed + 1;
-  std::mt19937::result_type seed_n = rngSeed + 2;
-  std::mt19937::result_type seed_u = rngSeed + 3;
-  auto K_rand = std::bind(std::uniform_int_distribution<unsigned>(0,K-1),
-                          std::mt19937(seed_K));
-  auto n_rand = std::bind(std::uniform_int_distribution<unsigned>(0,p-1),
-                          std::mt19937(seed_n));
-  auto u_rand = std::bind(std::uniform_real_distribution<double>(0,1),
-                          std::mt19937(seed_u));
-  
   MdpDecoder decoder(DistanceMatrix, m);			// initialize the decoder
   
   // initialize the BRKGA-based heuristic
   BRKGA< MdpDecoder, MTRand > algorithm(n, p, pe, pm, rhoe, decoder, rng, K, THREADS);
-  unsigned generation = 0;	// current generation
-  double BestLSFitness = 0;
   std::unordered_set< unsigned > BestTour;
-  double lastLSfitness = 0;
-  int gensLoosing = 0;
-  
+  double Best_LS_Fitness = 0;
+  double last_LS_fitness = 0;
+  double Best_BK_Fitness = 0;
+  double Best_Fitness = 0;
+  double last_BK_fitness = 0;  
   // Timing using chrono library
   auto start = std::chrono::steady_clock::now();
   std::chrono::duration<double> diff;
   double time_elapsed = 0;
   //verificar se esta estagnado, se estiver por X_INTVL iteracoes, reestart.
+  unsigned generation = 0;	// current generation
+  unsigned bestGeneration = 0;
+  unsigned gensLoosing = 0;
   unsigned relevantGeneration = 0;	// last relevant generation: best updated or reset called
   unsigned ImprovedSol = 0;
-  if (verbose) {
-    Rprintf("+--------------+--------------+------------+---------+----------+\n");
-    Rprintf("| Best Fitness | Local Search | Generation | Loosing | Duration |\n");
-  }
+  // if (verbose) {
+  //   Rprintf("+--------------+--------------+------------+---------+----------+\n");
+  //   Rprintf("| Best Fitness | Local Search | Generation |  Best   | Duration |\n");
+  // }
   
   
   double loopTime = 0;
@@ -603,60 +607,39 @@ Rcpp::List mdp_brkgaus(const arma::mat   DistanceMatrix,
     gensLoosing++;
     algorithm.evolve(GEN_INTVL);	// evolve the population for one generation
     
-    if ((generation % LS_INTVL == 0) & (method == 1)){
-      Progress p(1, true); // create the progress monitor
-      // candidate loop.
-      arma::vec K_fitness(K, arma::fill::zeros);
+    if ((generation % LS_INTVL == 0) && (method == 1)){
+      Progress p(1, false); // create the progress monitor
+      std::list< std::unordered_set<unsigned> > tours;
       std::unordered_set< unsigned > BestLSTour;
-#pragma omp parallel for schedule(dynamic)
+      #pragma omp parallel for schedule(dynamic)
       for(unsigned k_ = 0; k_ < K; k_++){
         std::vector<double> chromosome = algorithm.getBestPopulationChromosome(k_);
-        //std::copy(algorithm.getBestPopulationChromosome(k_).begin(), algorithm.getBestPopulationChromosome(k_).end(), chromosome.begin());
-        K_fitness(k_) = -getChromosomeFitness(chromosome, DistanceMatrix, m);
-        std::vector< std::pair< double, unsigned > > ranking(n);
-        // ranking is the chromosome and vector of indices [0, 1, ..., n-1]
-        for(unsigned i = 0; i < n; ++i) {
-          ranking[i] = std::pair< double, unsigned >(chromosome[i], i);
-        }
-        
         std::unordered_set< unsigned > M = get_M(chromosome, m);
         std::unordered_set< unsigned > N = get_N(n, M);
         
         //Look for improvements and update a population
-        double delta_Z = 0;
+        arma::vec alpha  = getAlphaVector(M, DistanceMatrix);
         for(auto it_m = M.begin(); it_m != M.end(); ++it_m) {
           //p.increment();
           for(auto it_n = N.begin(); it_n != N.end(); ++it_n) {
             // calculando o delta z (vizinho - melhor_Solucao)
-            delta_Z = 0;
-            //Rcpp::checkUserInterrupt();
-            for(auto item = M.begin(); item != M.end(); item++) {
-              if (*item != *it_m) 
-                delta_Z += -DistanceMatrix(*it_m, *item) + DistanceMatrix(*it_n, *item);
-            }
-            if (delta_Z > 0) {
+            double delta = alpha(*it_n) - alpha(*it_m) - DistanceMatrix(*it_m,*it_n);
+            // double delta = 0;
+            // for(auto item = M.begin(); item != M.end(); item++) {
+            //   if (*item != *it_m) 
+            //     delta += -DistanceMatrix(*it_m, *item) + DistanceMatrix(*it_n, *item);
+            // }
+            if (delta > 0) {
+              alpha = alpha - DistanceMatrix.col(*it_m) + DistanceMatrix.col(*it_n);
               M.insert(*it_n);
               N.insert(*it_m);
               M.erase(*it_m);
               N.erase(*it_n);
-              //Update Fitness
-              K_fitness(k_) -= delta_Z;
               it_m = M.begin();
               it_n = N.begin();
-//              if (u_rand() < lambda){
-//                //Rprintf("\nK rand: %i, n rand: % i\n", K_rand(), n_rand());
-//                algorithm.exchangeAlleles(chromosome, K_rand(), n_rand(), LocalSearchFitness);
-//              } 
               auto time = std::chrono::steady_clock::now();
               diff = time - start;
               time_elapsed = std::chrono::duration <double, std::milli> (diff).count()/1000;
-              // Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |", \
-              //         -K_fitness(k_),                   \
-              //         K_fitness(k_),                       \
-              //         generation,                                    \
-              //         gensLoosing,                                   \
-              //         time_elapsed);
-              // Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
             } 
             if (p.is_aborted()) break; // Get out of here!
             if (time_elapsed > MAX_TIME) break; // Get out of here!
@@ -664,28 +647,38 @@ Rcpp::List mdp_brkgaus(const arma::mat   DistanceMatrix,
           if (p.is_aborted()) break; // Get out of here!
           if (time_elapsed > MAX_TIME) break; // Get out of here!
         }
+        tours.push_front(M);
       }
-      //Rcpp::checkUserInterrupt();
-      
-      for(unsigned k_ = 0; k_ < K; k_++){
-        //Rprintf("\nBestLocalSearchFitness %f\n\n", K_fitness(k_));
-        if(K_fitness(k_) < BestLSFitness){
-          BestLSFitness = K_fitness(k_);
+
+      for(auto it = tours.begin(); it != tours.end(); it++){
+        std::vector<unsigned> Tour((*it).begin(),(*it).end());
+        double fitness = -getTourFitness(Tour, DistanceMatrix);
+        if(fitness < Best_LS_Fitness){
+          Best_LS_Fitness = fitness;
+          BestTour = *it;
         }
       }
       p.cleanup();   
     }
     
-    // for(unsigned i = 0; i < m; i++ )
-    //   Rcpp::Rcout << " " << LS_tour(i);
-    // Rcpp::Rcout << std::endl << std::endl;
-    
-    if (lastLSfitness < BestLSFitness){
+    if (algorithm.getBestFitness() < Best_BK_Fitness) {
+      Best_BK_Fitness = algorithm.getBestFitness();
+      if (Best_BK_Fitness < Best_Fitness){
+        bestGeneration = generation;
+        Best_Fitness = Best_BK_Fitness;
+      } 
+    }
+
+    if ((last_LS_fitness > Best_LS_Fitness) || (last_BK_fitness > Best_BK_Fitness)){
       ImprovedSol++;
+      if (Best_LS_Fitness < Best_Fitness) {
+        Best_Fitness = Best_LS_Fitness;
+        bestGeneration = generation;
+      }
     } 
     
-    //lastBKfitness = algorithm.getBestFitness();
-    lastLSfitness = BestLSFitness;
+    last_BK_fitness = Best_BK_Fitness;
+    last_LS_fitness = Best_LS_Fitness;
     
     //  Evolution strategy: restart
     if(generation - relevantGeneration > RESET_AFTER) {
@@ -702,22 +695,42 @@ Rcpp::List mdp_brkgaus(const arma::mat   DistanceMatrix,
     // Store the time difference between start and end
     diff = end - start;
     loopTime = std::chrono::duration <double, std::milli> (diff).count()/1000;
-    if (verbose) {
-      Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |", \
-              -algorithm.getBestFitness(),                   \
-              -BestLSFitness,                                \
-              generation,                                    \
-              gensLoosing,                                   \
-              loopTime);
-      Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
-    }
+    
+    // if (verbose) {
+    //   Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
+    //   Rprintf("| Best Fitness | Local Search | Generation |  Best   | Duration |\n");
+    //   Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");      
+    //   Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |", \
+    //           -Best_BK_Fitness,                   \
+    //           -Best_LS_Fitness,                                \
+    //           generation,                                    \
+    //           bestGeneration,                                   \
+    //           loopTime);
+    //   Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
+    // }
   } while ((loopTime <= MAX_TIME) && (gensLoosing <= MAX_GENS));
+  
+  if (verbose) {
+    Rprintf("\n+--------------+--------------+------------+---------+----------+");
+    Rprintf("\n| Best Fitness | Local Search | Generation |  Best   | Duration |");
+    Rprintf("\n+--------------+--------------+------------+---------+----------+");      
+    Rprintf("\n| %12.2f | %12.2f | %10i | %7i | %7.1fs |",    \
+            -Best_BK_Fitness,                                 \
+            -Best_LS_Fitness,                                 \
+            generation,                                       \
+            bestGeneration,                                   \
+            loopTime);
+    Rprintf("\n+--------------+--------------+------------+---------+----------+");
+  }
+  
   Rprintf("\n\nThis is the end. The Doors.\n");
   Rcpp::List rst = Rcpp::List::create(
-    //Rcpp::Named("Tour") = LS_tour,
-    Rcpp::Named("LSFitness") = -BestLSFitness,
-    Rcpp::Named("BKFitness") = -algorithm.getBestFitness(),
+    Rcpp::Named("Tour") = BestTour,
+    Rcpp::Named("Teste") =  getAlphaVector(BestTour, DistanceMatrix),    
+    Rcpp::Named("LSFitness") = -Best_LS_Fitness,
+    Rcpp::Named("BKFitness") = -Best_BK_Fitness,
     Rcpp::Named("Generations Number") = generation,
+    Rcpp::Named("Best Generation") = bestGeneration,
     Rcpp::Named("Improvement Number") = ImprovedSol,
     Rcpp::Named("Duration") = loopTime);
   return rst;
