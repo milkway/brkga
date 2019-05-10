@@ -624,10 +624,11 @@ Rcpp::List mdp_brkgaus(const arma::mat   DistanceMatrix,
   unsigned gensLoosing = 0;
   unsigned relevantGeneration = 0;	// last relevant generation: best updated or reset called
   unsigned ImprovedSol = 0;
-  // if (verbose) {
-  //   Rprintf("+--------------+--------------+------------+---------+----------+\n");
-  //   Rprintf("| Best Fitness | Local Search | Generation |  Best   | Duration |\n");
-  // }
+  if (verbose) {
+    Rprintf("+--------------+--------------+------------+---------+----------+\n");
+    Rprintf("| Best Fitness | Local Search | Generation |  Best   | Duration |\n");
+    Rprintf("\n+--------------+--------------+------------+---------+----------\n+");      
+  }
   
   double loopTime = 0;
   MilkProgressBar mpb; // Colocar display false e fazer um rprintf no "do" mesmo
@@ -749,7 +750,6 @@ Rcpp::List mdp_brkgaus(const arma::mat   DistanceMatrix,
   Rprintf("\n\nThis is the end. The Doors.\n");
   Rcpp::List rst = Rcpp::List::create(
     Rcpp::Named("Tour") = BestTour,
-    Rcpp::Named("Teste") =  getAlphaVector(BestTour, DistanceMatrix),    
     Rcpp::Named("LSFitness") = -Best_LS_Fitness,
     Rcpp::Named("BKFitness") = -Best_BK_Fitness,
     Rcpp::Named("Generations Number") = generation,
