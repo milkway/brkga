@@ -4,46 +4,58 @@ library(brkga)
 lista <- read_rds(system.file("extdata", package = "brkga",  "mdplib.rds")) %>% 
   mutate(Name = paste0("conv_", Instance), 
          Type = str_sub(Name, 6,8), 
+         Number = as.integer(str_remove(str_sub(Name, 12, 13), "_")),
          SubType = str_sub(Name, 10,10), 
          n = as.integer(str_remove(str_extract(Name,pattern = "n\\d+"), pattern = "n")),
          m = as.integer(str_remove(str_extract(Name,pattern = "m\\d+"), pattern = "m"))) %>% 
-  filter(Type == "MDG", SubType == "a")
+  filter(Type == "MDG")
 
 
 N <- 10 # Número de rodadas
 
+
 resultado <- tibble()
 
-  for (k in 1:nrow(lista)){#
-    dist_matrix <- read_rds(system.file("extdata", package = "brkga",  paste0(lista$Type[k], ".", k, ".", lista$SubType[k], ".n", lista$n[k], "m", lista$m[k])))
+for (k in 1:nrow(lista)){#
+  dist_matrix <- read_rds(system.file("extdata", package = "brkga", paste0(
+                                      lista$Type[k], ".", lista$Number[k], ".", 
+                                      lista$SubType[k], ".n", 
+                                      lista$n[k], "m", 
+                                      lista$m[k],".rds")                                    
+                                      ))
     m <- lista$m[k]
     bestValue <- lista$`Best Value`[k]
     InstName <- lista$Name[k]
     for (i in 1:N){
-      seed <- abs(round(rnorm(1)*10000))
+      cat(sprintf("Instance %d of %d. Replication %d of %d.             \r", k, nrow(lista), i, N))
+      seed <- as.integer(Sys.time())
       rst <- brkga::mdp_brkga(DistanceMatrix = dist_matrix,
-                              m = m,
+                              m = m, 
+                              LS_INTVL = 1,
+                              GEN_INTVL = 1,
                               MAX_TIME = 7200, 
                               p = 150, 
                               pe = .2, 
                               pm = .2,
                               rhoe = .75,
-                              MAXT=8, 
-                              K=1, 
+                              THREADS = 4, 
+                              K=4, 
                               MAX_GENS = 500,
-                              RESET_AFTER = 100, 
+                              RESET_AFTER = 20, 
+                              verbose = FALSE,
                               rngSeed = seed)
       
       resultado <- bind_rows(
         resultado,
         tibble(
-          Order = i,
+          Order = i, 
           Seed = seed,
-          Tour = list(rst$PDMSolution),
-          BRKGA = rst$FitnessBRKGA,
-          LS = rst$FitnessLS,
+          Tour = list(rst$Tour),
+          BRKGA = rst$BKFitness,
+          LS = rst$LSFitness,
           N_gen = rst$`Generations Number`,
           N_imp = rst$`Improvement Number`,
+          N_bst = rst$`Best Generation`,
           Instancia = InstName,
           Duration = rst$Duration,
           Target = bestValue,
@@ -67,8 +79,7 @@ resultado <- tibble()
       # )
     }
     rm(i, rst, seed, bestValue, dist_matrix, InstName, m)
-    write_rds(resultado, path = "~/Dropbox/resultado.rds")
-    write_csv(resultado %>% select(-Tour), path = "~/Dropbox/resultado.csv")
+    write_rds(resultado, path = "~/data/brkga.rds")
   }
 
 
