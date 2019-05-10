@@ -21,6 +21,35 @@
 
 
 
+class MilkProgressBar: public ProgressBar{
+public:
+  MilkProgressBar()  {
+    _finalized = false;
+  }
+  
+  ~MilkProgressBar() {}
+  
+  void display() {
+    REprintf("Generation: ");
+  }
+  
+  void update(float progress) {
+    if (_finalized) return;
+    REprintf("+");
+  }
+  
+  void end_display() {
+    if (_finalized) return;
+    REprintf("\n");
+    _finalized = true;
+  }
+  
+private:
+  
+  bool _finalized;
+  
+};
+
 // Used to sort ranking by second argument
 bool compare(const std::pair<double, int>&i, const std::pair<double, int>&j)
 {
@@ -600,15 +629,15 @@ Rcpp::List mdp_brkgaus(const arma::mat   DistanceMatrix,
   //   Rprintf("| Best Fitness | Local Search | Generation |  Best   | Duration |\n");
   // }
   
-  
   double loopTime = 0;
+  MilkProgressBar mpb; // Colocar display false e fazer um rprintf no "do" mesmo
+  Progress mp(25, true, mpb); // create the progress monitor
   do {
-    
+    mp.increment();
     gensLoosing++;
     algorithm.evolve(GEN_INTVL);	// evolve the population for one generation
     
     if ((generation % LS_INTVL == 0) && (method == 1)){
-      Progress p(1, false); // create the progress monitor
       std::list< std::unordered_set<unsigned> > tours;
       std::unordered_set< unsigned > BestLSTour;
       #pragma omp parallel for schedule(dynamic)
@@ -624,11 +653,6 @@ Rcpp::List mdp_brkgaus(const arma::mat   DistanceMatrix,
           for(auto it_n = N.begin(); it_n != N.end(); ++it_n) {
             // calculando o delta z (vizinho - melhor_Solucao)
             double delta = alpha(*it_n) - alpha(*it_m) - DistanceMatrix(*it_m,*it_n);
-            // double delta = 0;
-            // for(auto item = M.begin(); item != M.end(); item++) {
-            //   if (*item != *it_m) 
-            //     delta += -DistanceMatrix(*it_m, *item) + DistanceMatrix(*it_n, *item);
-            // }
             if (delta > 0) {
               alpha = alpha - DistanceMatrix.col(*it_m) + DistanceMatrix.col(*it_n);
               M.insert(*it_n);
@@ -641,10 +665,10 @@ Rcpp::List mdp_brkgaus(const arma::mat   DistanceMatrix,
               diff = time - start;
               time_elapsed = std::chrono::duration <double, std::milli> (diff).count()/1000;
             } 
-            if (p.is_aborted()) break; // Get out of here!
+            if (mp.is_aborted()) break; // Get out of here!
             if (time_elapsed > MAX_TIME) break; // Get out of here!
           }
-          if (p.is_aborted()) break; // Get out of here!
+          if (mp.is_aborted()) break; // Get out of here!
           if (time_elapsed > MAX_TIME) break; // Get out of here!
         }
         tours.push_front(M);
@@ -658,7 +682,6 @@ Rcpp::List mdp_brkgaus(const arma::mat   DistanceMatrix,
           BestTour = *it;
         }
       }
-      p.cleanup();   
     }
     
     if (algorithm.getBestFitness() < Best_BK_Fitness) {
@@ -709,7 +732,7 @@ Rcpp::List mdp_brkgaus(const arma::mat   DistanceMatrix,
     //   Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
     // }
   } while ((loopTime <= MAX_TIME) && (gensLoosing <= MAX_GENS));
-  
+  mp.cleanup();   
   if (verbose) {
     Rprintf("\n+--------------+--------------+------------+---------+----------+");
     Rprintf("\n| Best Fitness | Local Search | Generation |  Best   | Duration |");
