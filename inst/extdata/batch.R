@@ -81,6 +81,7 @@ for (k in 1:nrow(lista)){#
     write_rds(resultado, path = "~/data/brkga.rds")
   }
 
+cat("\nThis is the end. The Doors.")
 
 # resultado %>% 
 #   group_by(Instancia) %>% 

@@ -127,3 +127,87 @@ res <- brkga::mdp_brkga(DistanceMatrix = dist_matrix,
                         MAX_GENS = 150,
                         RESET_AFTER = 100, 
                         rngSeed = 265)
+
+
+dist_matrix <- read_rds(system.file("extdata", package = "brkga", paste0(
+  lista$Type[1], ".", lista$Number[1], ".", 
+  lista$SubType[1], ".n", 
+  lista$n[1], "m", 
+  lista$m[1],".rds")                                    
+))
+
+rst <- brkga::mdp_brkgals(DistanceMatrix = dist_matrix,
+                          m = m, 
+                          LS_INTVL = 1,
+                          GEN_INTVL = 1,
+                          MAX_TIME = 10*60, 
+                          p = 150, 
+                          pe = .2, 
+                          pm = .2,
+                          rhoe = .75,
+                          THREADS = 8, 
+                          K=8, 
+                          MAX_GENS = 500,
+                          RESET_AFTER = 20, 
+                          verbose = TRUE,
+                          rngSeed =  as.integer(Sys.time()))
+
+rst <- brkga::mdp_brkga2(DistanceMatrix = dist_matrix,
+                         m = m, 
+                         LS_INTVL = 1,
+                         GEN_INTVL = 1,
+                         MAX_TIME = 10*60, 
+                         p = 150, 
+                         pe = .2, 
+                         pm = .2,
+                         rhoe = .75,
+                         THREADS = 8, 
+                         K=8, 
+                         MAX_GENS = 500,
+                         RESET_AFTER = 20, 
+                         verbose = TRUE,
+                         rngSeed =  as.integer(Sys.time()))
+
+rst <- brkga::mdp_brkgaArma(DistanceMatrix = dist_matrix,
+                            m = m, 
+                            LS_INTVL = 1,
+                            GEN_INTVL = 1,
+                            MAX_TIME = 10, 
+                            p = 150, 
+                            pe = .2, 
+                            pm = .2,
+                            rhoe = .75,
+                            THREADS = 8, 
+                            K=8, 
+                            MAX_GENS = 30,
+                            RESET_AFTER = 20, 
+                            verbose = TRUE,
+                            rngSeed =  as.integer(Sys.time()))
+
+
+rst <- brkga::mdp_brkgaArma(DistanceMatrix = dist_matrix,
+                            m = m, 
+                            LS_INTVL = 1,
+                            GEN_INTVL = 1,
+                            MAX_TIME = 10, 
+                            p = 500, 
+                            pe = .2, 
+                            pm = .2,
+                            rhoe = .70,
+                            THREADS = 8, 
+                            K=8, 
+                            MAX_GENS = 100,
+                            RESET_AFTER = 10, 
+                            verbose = TRUE,
+                            rngSeed =  as.integer(Sys.time()))
+
+rst <- mdp_brkga(DistanceMatrix = dist_matrix, 
+                 m = 50, 
+                 LS_INTVL = 1, 
+                 K = 8,
+                 GEN_INTVL = 1, 
+                 MAX_TIME = 10, 
+                 MAX_GENS = 1000, 
+                 RESET_AFTER = 10, 
+                 rngSeed = as.integer(Sys.time()), 
+                 THREADS = 8)

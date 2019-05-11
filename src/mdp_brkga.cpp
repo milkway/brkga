@@ -135,7 +135,7 @@ double Arma_getChromosomeFitness(const std::vector< double >& chromosome, const 
 //' @return A numeric vector of random values
 //' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
 //' @export 
-// [[Rcpp::export(mdp_brkga)]]
+// [[Rcpp::export("mdp_brkga")]]
 Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,  
                       const unsigned                 m,   // Number of elements selected (m <= n)
                       const unsigned     LS_INTVL = 10,   // Generations between local searches 
