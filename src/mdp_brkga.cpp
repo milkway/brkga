@@ -1,8 +1,8 @@
 #include "RcppArmadillo.h"
 // [[Rcpp::depends(RcppArmadillo)]]
 
-#include <omp.h>
-// [[Rcpp::plugins(openmp)]]
+// #include <omp.h>
+// // [[Rcpp::plugins(openmp)]]
 // // [[Rcpp::depends(RcppProgress)]]
 // #include <progress.hpp>
 // #include <progress_bar.hpp>
@@ -159,10 +159,6 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
                       const long unsigned rngSeed = 0	   // seed to the random number generator
 ) {
   
-  if ( THREADS > 0 )
-    omp_set_num_threads( THREADS );
-  //Rprintf("\nNumber of threads=%i\n", omp_get_max_threads());
-  
   if (DistanceMatrix.n_cols != DistanceMatrix.n_rows) Rcpp::stop("Distance matrix must be square!");
   unsigned n = DistanceMatrix.n_cols;				// size of chromosomes
   
@@ -195,6 +191,7 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
   }
   
   double loopTime = 0;
+  double delta = 0;
   //Progress mp(1, false); // create the progress monitor
   do {
     gensLoosing++;
@@ -229,8 +226,8 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
           for(unsigned i = 0; i < m; i++) {
             for(unsigned j = 0; j < (n-m); j++) {
               // calculando o delta z (vizinho - melhor_Solucao)
-              double delta = alpha(N(j)) - alpha(M(i)) - DistanceMatrix(M(i),N(j));
-              if (delta > arma::datum::eps) {
+              delta = alpha(N(j)) - alpha(M(i)) - DistanceMatrix(M(i),N(j));
+              if (std::isgreaterequal(delta, 0.0)) {
                 flag = true;
                 alpha = alpha - DistanceMatrix.col(M(i)) + DistanceMatrix.col(N(j));
                 unsigned aux = M[i];
@@ -241,7 +238,7 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
                 time_elapsed = std::chrono::duration <double, std::milli> (diff).count()/1000;
                 if (verbose == 2) {
                   Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |",    \
-                          -Best_BK_Fitness,                                 \
+                          delta,                                 \
                           -Best_LS_Fitness,                                 \
                           generation,                                       \
                           bestGeneration,                                   \

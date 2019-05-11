@@ -201,6 +201,7 @@ rst <- brkga::mdp_brkgaArma(DistanceMatrix = dist_matrix,
                             verbose = TRUE,
                             rngSeed =  as.integer(Sys.time()))
 
+library(brkga)
 rst <- mdp_brkga(DistanceMatrix = dist_matrix, 
                  m = 50, 
                  LS_INTVL = 1, 
