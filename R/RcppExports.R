@@ -19,6 +19,24 @@ getN <- function(chromosome, m) {
     .Call(`_brkga_Arma_get_N`, chromosome, m)
 }
 
+#' Get Alpha vector
+#' @details Get the distance from nodes to every node in M
+#' @param \code{Tour} Set of nodes;
+#' @param \code{Distances} Distance matrix
+#' @export
+getAlphaVector <- function(Tour, Distances) {
+    .Call(`_brkga_Arma_getAlphaVector`, Tour, Distances)
+}
+
+#' Get Binet tour
+#' @details Get the binary representation of the tour
+#' @param \code{Tour} Set of nodes;
+#' @param \code{n} Number of nodes
+#' @export
+getTourBinary <- function(Tour, n) {
+    .Call(`_brkga_Arma_getBinaryTour`, Tour, n)
+}
+
 #' Get fitness from tour
 #' @details Get fitness using the tour, m and distance matrix
 #' @param \code{Tour} Set of tour's nodes.
@@ -61,7 +79,7 @@ getChromosomeFitness <- function(chromosome, Distances, m) {
 #' @return A numeric vector of random values
 #' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
 #' @export 
-mdp_brkga <- function(DistanceMatrix, m, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 4L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L, verbose = TRUE, rngSeed = 0L) {
+mdp_brkga <- function(DistanceMatrix, m, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 4L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L, verbose = 2L, rngSeed = 0L) {
     .Call(`_brkga_mdp_brkgaArma`, DistanceMatrix, m, LS_INTVL, GEN_INTVL, MAX_TIME, p, pe, pm, rhoe, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed)
 }
 

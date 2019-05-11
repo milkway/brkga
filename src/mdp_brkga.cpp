@@ -3,9 +3,9 @@
 
 #include <omp.h>
 // [[Rcpp::plugins(openmp)]]
-// [[Rcpp::depends(RcppProgress)]]
-#include <progress.hpp>
-#include <progress_bar.hpp>
+// // [[Rcpp::depends(RcppProgress)]]
+// #include <progress.hpp>
+// #include <progress_bar.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -42,37 +42,40 @@ arma::uvec Arma_get_M(const arma::vec& chromosome, unsigned m){
 // [[Rcpp::export("getN")]]
 arma::uvec Arma_get_N(const arma::vec& chromosome, unsigned m){
   arma::uvec M = arma::sort_index(chromosome);
-  return(M.tail(M.size()-m));
+  unsigned n = chromosome.size();
+  return(M.tail(n-m));
 }
 
 
-///' Get Alpha vector
-///' @details Get the distance from nodes to every node in M
-///' @param \code{Tour} Set of nodes;
-///' @param \code{Distances} Distance matrix
-///' @export
-/// [[Rcpp::export("getAlphaVector)]]
+//' Get Alpha vector
+//' @details Get the distance from nodes to every node in M
+//' @param \code{Tour} Set of nodes;
+//' @param \code{Distances} Distance matrix
+//' @export
+// [[Rcpp::export("getAlphaVector")]]
 arma::vec Arma_getAlphaVector(const arma::uvec& Tour, const arma::mat& Distances){
   unsigned n = Distances.n_cols;
+  unsigned m = Tour.size();
   arma::vec alpha = arma::zeros<arma::vec>(n);
-  for(auto it = Tour.begin(); it != Tour.end(); it++){
-      alpha[*it] = 1.0;
+  for(unsigned i = 0; i < m; i++){
+      alpha(Tour(i)) = 1.0;
   }
   return(Distances*alpha);
 }
 
 
 
-///' Get Binet tour
-///' @details Get the binary representation of the tour
-///' @param \code{Tour} Set of nodes;
-///' @param \code{n} Number of nodes
-///' @export
-/// [[Rcpp::export("getTourBinary")]]
+//' Get Binet tour
+//' @details Get the binary representation of the tour
+//' @param \code{Tour} Set of nodes;
+//' @param \code{n} Number of nodes
+//' @export
+// [[Rcpp::export("getTourBinary")]]
 arma::uvec Arma_getBinaryTour(const arma::uvec& Tour, unsigned n){
   arma::uvec alpha = arma::zeros<arma::uvec>(n);
-  for(auto it = Tour.begin(); it != Tour.end(); it++){
-    alpha[*it] = 1;
+  unsigned m = Tour.size();
+  for(unsigned i = 0; i < m; i++){
+    alpha(Tour(i)) = 1;
   }
   return(alpha);
 }
@@ -87,9 +90,10 @@ arma::uvec Arma_getBinaryTour(const arma::uvec& Tour, unsigned n){
 // [[Rcpp::export("getTourFitness")]]
 double Arma_getTourFitness(const arma::uvec& Tour, const arma::mat& Distances){
   double Fitness = 0;
-  for (auto i = Tour.begin(); i != Tour.end(); ++i) {
-    for (auto j = i; j != Tour.end(); ++j) {
-      Fitness += Distances(*i, *j);
+  unsigned m = Tour.size();
+  for (unsigned i = 0; i < m; i++) {
+    for (auto j = i; j <  m; j++) {
+      Fitness += Distances(Tour(i), Tour(j));
     }
   }
   return(Fitness);
@@ -103,8 +107,8 @@ double Arma_getTourFitness(const arma::uvec& Tour, const arma::mat& Distances){
 //' @return A double value representing the chromosome fitness
 //' @export 
 // [[Rcpp::export("getChromosomeFitness")]]
-double Arma_getChromosomeFitness(const std::vector< double >& chromosome, const arma::mat& Distances, unsigned m){
-  arma::uvec Ranking = arma::sort_index(arma::conv_to< arma::vec >::from(chromosome));
+double Arma_getChromosomeFitness(const arma::vec& chromosome, const arma::mat& Distances, unsigned m){
+  arma::uvec Ranking = arma::sort_index(chromosome);
   arma::uvec M = Ranking.head(m);
   double Fitness = Arma_getTourFitness(M, Distances);
   return(Fitness);
@@ -151,7 +155,7 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
                       const unsigned     X_NUMBER = 2,	   // exchange top 2 best
                       const unsigned     MAX_GENS = 100,  // Max generations without improvement 
                       const unsigned RESET_AFTER = 200, 
-                      const bool          verbose = true, 
+                      const unsigned     verbose = 2, 
                       const long unsigned rngSeed = 0	   // seed to the random number generator
 ) {
   
@@ -169,11 +173,11 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
   BRKGA< MdpDecoder, MTRand > algorithm(n, p, pe, pm, rhoe, decoder, rng, K, THREADS);
   //std::unordered_set< unsigned > BestTour;
   arma::uvec BestTour(m, arma::fill::zeros); 
-  double Best_LS_Fitness = 0;
-  double last_LS_fitness = 0;
-  double Best_BK_Fitness = 0;
-  double Best_Fitness = 0;
-  double last_BK_fitness = 0;  
+  double Best_LS_Fitness = -arma::datum::eps;
+  double last_LS_fitness = -arma::datum::eps;
+  double Best_BK_Fitness = -arma::datum::eps;
+  double Best_Fitness = -arma::datum::eps;
+  double last_BK_fitness = -arma::datum::eps;  
   // Timing using chrono library
   auto start = std::chrono::steady_clock::now();
   std::chrono::duration<double> diff;
@@ -184,14 +188,14 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
   unsigned gensLoosing = 0;
   unsigned relevantGeneration = 0;	// last relevant generation: best updated or reset called
   unsigned ImprovedSol = 0;
-  if (verbose) {
+  if (verbose >= 1) {
     Rprintf("+--------------+--------------+------------+---------+----------+\n");
     Rprintf("| Best BRKGA   | Local Search | Generation | Bst Gen | Duration |\n");
     Rprintf("+--------------+--------------+------------+---------+----------+\n");      
   }
   
   double loopTime = 0;
-  Progress mp(1, false); // create the progress monitor
+  //Progress mp(1, false); // create the progress monitor
   do {
     gensLoosing++;
     algorithm.evolve(GEN_INTVL);	// evolve the population for one generation
@@ -205,29 +209,20 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
       } 
     }
     
-    if (verbose) {
-      Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |",    \
-              -Best_BK_Fitness,                                 \
-              -Best_LS_Fitness,                                 \
-              generation,                                       \
-              bestGeneration,                                   \
-              loopTime);
-      Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
-    }
     if ((generation % LS_INTVL == 0)){
       arma::umat tours(m, K, arma::fill::zeros);
       arma::uvec BestLSTour(m, arma::fill::zeros);
-#pragma omp parallel for schedule(static, 1)
+
       for(unsigned k = 0; k < K; k++){
         std::vector<double> chromosome = algorithm.getBestPopulationChromosome(k);
         arma::uvec Ranking = arma::sort_index(arma::conv_to< arma::vec >::from(chromosome));
         arma::uvec M = Ranking.head(m);
         arma::uvec N = Ranking.tail(n-m);
-        
         //Look for improvements and update a population
         arma::vec alpha  = Arma_getAlphaVector(M, DistanceMatrix);
         bool flag = true;
         while (flag) {
+          Rcpp::checkUserInterrupt();
           M = arma::shuffle(M);
           N = arma::shuffle(N);
           flag = false;
@@ -244,14 +239,20 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
                 auto time = std::chrono::steady_clock::now();
                 diff = time - start;
                 time_elapsed = std::chrono::duration <double, std::milli> (diff).count()/1000;
+                if (verbose == 2) {
+                  Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |",    \
+                          -Best_BK_Fitness,                                 \
+                          -Best_LS_Fitness,                                 \
+                          generation,                                       \
+                          bestGeneration,                                   \
+                          time_elapsed);
+                  Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
+                }
               } 
-              if (mp.is_aborted()) break; // Get out of here!
               if (time_elapsed > MAX_TIME) break; // Get out of here!
             }
-            if (mp.is_aborted()) break; // Get out of here!
             if (time_elapsed > MAX_TIME) break; // Get out of here!
           } 
-          if (mp.is_aborted()) break; // Get out of here!
           if (time_elapsed > MAX_TIME) break; // Get out of here!
         }
         tours.col(k) = M;
@@ -296,8 +297,7 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
     diff = end - start;
     loopTime = std::chrono::duration <double, std::milli> (diff).count()/1000;
   } while ((loopTime <= MAX_TIME) && (gensLoosing <= MAX_GENS));
-  mp.cleanup();   
-  if (verbose) {
+  if (verbose >= 1 ) {
     Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |",    \
             -Best_BK_Fitness,                                 \
             -Best_LS_Fitness,                                 \

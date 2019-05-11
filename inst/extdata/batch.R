@@ -39,7 +39,7 @@ for (k in 1:nrow(lista)){#
                               rhoe = .75,
                               THREADS = 8, 
                               K=8, 
-                              MAX_GENS = 5,
+                              MAX_GENS = 500,
                               RESET_AFTER = 20, 
                               verbose = FALSE,
                               rngSeed = seed)

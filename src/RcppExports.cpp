@@ -30,6 +30,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// Arma_getAlphaVector
+arma::vec Arma_getAlphaVector(const arma::uvec& Tour, const arma::mat& Distances);
+RcppExport SEXP _brkga_Arma_getAlphaVector(SEXP TourSEXP, SEXP DistancesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::uvec& >::type Tour(TourSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Distances(DistancesSEXP);
+    rcpp_result_gen = Rcpp::wrap(Arma_getAlphaVector(Tour, Distances));
+    return rcpp_result_gen;
+END_RCPP
+}
+// Arma_getBinaryTour
+arma::uvec Arma_getBinaryTour(const arma::uvec& Tour, unsigned n);
+RcppExport SEXP _brkga_Arma_getBinaryTour(SEXP TourSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::uvec& >::type Tour(TourSEXP);
+    Rcpp::traits::input_parameter< unsigned >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(Arma_getBinaryTour(Tour, n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // Arma_getTourFitness
 double Arma_getTourFitness(const arma::uvec& Tour, const arma::mat& Distances);
 RcppExport SEXP _brkga_Arma_getTourFitness(SEXP TourSEXP, SEXP DistancesSEXP) {
@@ -43,12 +67,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // Arma_getChromosomeFitness
-double Arma_getChromosomeFitness(const std::vector< double >& chromosome, const arma::mat& Distances, unsigned m);
+double Arma_getChromosomeFitness(const arma::vec& chromosome, const arma::mat& Distances, unsigned m);
 RcppExport SEXP _brkga_Arma_getChromosomeFitness(SEXP chromosomeSEXP, SEXP DistancesSEXP, SEXP mSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::vector< double >& >::type chromosome(chromosomeSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type chromosome(chromosomeSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type Distances(DistancesSEXP);
     Rcpp::traits::input_parameter< unsigned >::type m(mSEXP);
     rcpp_result_gen = Rcpp::wrap(Arma_getChromosomeFitness(chromosome, Distances, m));
@@ -56,7 +80,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // mdp_brkgaArma
-Rcpp::List mdp_brkgaArma(const arma::mat DistanceMatrix, const unsigned m, const unsigned LS_INTVL, const unsigned GEN_INTVL, const unsigned MAX_TIME, const unsigned p, const double pe, const double pm, const double rhoe, const unsigned K, const unsigned THREADS, const unsigned X_INTVL, const unsigned X_NUMBER, const unsigned MAX_GENS, const unsigned RESET_AFTER, const bool verbose, const long unsigned rngSeed);
+Rcpp::List mdp_brkgaArma(const arma::mat DistanceMatrix, const unsigned m, const unsigned LS_INTVL, const unsigned GEN_INTVL, const unsigned MAX_TIME, const unsigned p, const double pe, const double pm, const double rhoe, const unsigned K, const unsigned THREADS, const unsigned X_INTVL, const unsigned X_NUMBER, const unsigned MAX_GENS, const unsigned RESET_AFTER, const unsigned verbose, const long unsigned rngSeed);
 RcppExport SEXP _brkga_mdp_brkgaArma(SEXP DistanceMatrixSEXP, SEXP mSEXP, SEXP LS_INTVLSEXP, SEXP GEN_INTVLSEXP, SEXP MAX_TIMESEXP, SEXP pSEXP, SEXP peSEXP, SEXP pmSEXP, SEXP rhoeSEXP, SEXP KSEXP, SEXP THREADSSEXP, SEXP X_INTVLSEXP, SEXP X_NUMBERSEXP, SEXP MAX_GENSSEXP, SEXP RESET_AFTERSEXP, SEXP verboseSEXP, SEXP rngSeedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -76,7 +100,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const unsigned >::type X_NUMBER(X_NUMBERSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type MAX_GENS(MAX_GENSSEXP);
     Rcpp::traits::input_parameter< const unsigned >::type RESET_AFTER(RESET_AFTERSEXP);
-    Rcpp::traits::input_parameter< const bool >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type verbose(verboseSEXP);
     Rcpp::traits::input_parameter< const long unsigned >::type rngSeed(rngSeedSEXP);
     rcpp_result_gen = Rcpp::wrap(mdp_brkgaArma(DistanceMatrix, m, LS_INTVL, GEN_INTVL, MAX_TIME, p, pe, pm, rhoe, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed));
     return rcpp_result_gen;
@@ -673,6 +697,8 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_brkga_Arma_get_M", (DL_FUNC) &_brkga_Arma_get_M, 2},
     {"_brkga_Arma_get_N", (DL_FUNC) &_brkga_Arma_get_N, 2},
+    {"_brkga_Arma_getAlphaVector", (DL_FUNC) &_brkga_Arma_getAlphaVector, 2},
+    {"_brkga_Arma_getBinaryTour", (DL_FUNC) &_brkga_Arma_getBinaryTour, 2},
     {"_brkga_Arma_getTourFitness", (DL_FUNC) &_brkga_Arma_getTourFitness, 2},
     {"_brkga_Arma_getChromosomeFitness", (DL_FUNC) &_brkga_Arma_getChromosomeFitness, 3},
     {"_brkga_mdp_brkgaArma", (DL_FUNC) &_brkga_mdp_brkgaArma, 17},
