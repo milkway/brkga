@@ -1,4 +1,3 @@
-library(tidyverse)
 library(brkga)
 
 lista <- read_rds(system.file("extdata", package = "brkga",  "mdplib.rds")) %>% 
@@ -38,9 +37,9 @@ for (k in 1:nrow(lista)){#
                               pe = .2, 
                               pm = .2,
                               rhoe = .75,
-                              THREADS = 4, 
-                              K=4, 
-                              MAX_GENS = 500,
+                              THREADS = 8, 
+                              K=8, 
+                              MAX_GENS = 5,
                               RESET_AFTER = 20, 
                               verbose = FALSE,
                               rngSeed = seed)
