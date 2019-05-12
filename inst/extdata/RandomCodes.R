@@ -212,3 +212,14 @@ rst <- mdp_brkga(DistanceMatrix = dist_matrix,
                  RESET_AFTER = 10, 
                  rngSeed = as.integer(Sys.time()), 
                  THREADS = 8)
+
+rst <- mdp_brkga_uset(DistanceMatrix = dist_matrix, 
+                 m = 50, 
+                 LS_INTVL = 1, 
+                 K = 8,
+                 GEN_INTVL = 1, 
+                 MAX_TIME = 10, 
+                 MAX_GENS = 1000, 
+                 RESET_AFTER = 10, 
+                 rngSeed = as.integer(Sys.time()), 
+                 THREADS = 8)
