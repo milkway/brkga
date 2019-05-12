@@ -130,10 +130,10 @@ res <- brkga::mdp_brkga(DistanceMatrix = dist_matrix,
 
 
 dist_matrix <- read_rds(system.file("extdata", package = "brkga", paste0(
-  lista$Type[1], ".", lista$Number[1], ".", 
-  lista$SubType[1], ".n", 
-  lista$n[1], "m", 
-  lista$m[1],".rds")                                    
+  lista$Type[21], ".", lista$Number[21], ".", 
+  lista$SubType[21], ".n", 
+  lista$n[21], "m", 
+  lista$m[21],".rds")                                    
 ))
 
 rst <- brkga::mdp_brkgals(DistanceMatrix = dist_matrix,
@@ -211,7 +211,7 @@ rst <- mdp_brkga(DistanceMatrix = dist_matrix,
                  MAX_GENS = 1000, 
                  RESET_AFTER = 10, 
                  rngSeed = as.integer(Sys.time()), 
-                 THREADS = 8)
+                 THREADS = 8, verbose = 2)
 
 rst <- mdp_brkga_uset(DistanceMatrix = dist_matrix, 
                  m = 50, 
@@ -222,4 +222,4 @@ rst <- mdp_brkga_uset(DistanceMatrix = dist_matrix,
                  MAX_GENS = 1000, 
                  RESET_AFTER = 10, 
                  rngSeed = as.integer(Sys.time()), 
-                 THREADS = 8)
+                 THREADS = 8, verbose = 2)

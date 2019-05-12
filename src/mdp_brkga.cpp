@@ -206,7 +206,20 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
       } 
     }
     
+    if (verbose == 2) {
+      Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |",    \
+              -Best_BK_Fitness,                                 \
+              -Best_LS_Fitness,                                 \
+              generation,                                       \
+              bestGeneration,                                   \
+              loopTime);
+      Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
+    }
+    
+    
     if ((generation % LS_INTVL == 0)){
+      arma::umat tours(m, K, arma::fill::zeros);
+#pragma omp parallel for  schedule(static)    
       for(unsigned k = 0; k < K; k++){
         std::vector<double> chromosome = algorithm.getBestPopulationChromosome(k);
         arma::uvec Ranking = arma::sort_index(arma::conv_to< arma::vec >::from(chromosome));
@@ -216,7 +229,7 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
         arma::vec alpha  = Arma_getAlphaVector(M, DistanceMatrix);
         bool flag = true;
         while (flag) {
-          Rcpp::checkUserInterrupt();
+          //Rcpp::checkUserInterrupt();
           M = arma::shuffle(M);
           N = arma::shuffle(N);
           flag = false;
@@ -235,26 +248,36 @@ Rcpp::List mdp_brkgaArma(const arma::mat   DistanceMatrix,
             auto time = std::chrono::steady_clock::now();
             diff = time - start;
             time_elapsed = std::chrono::duration <double, std::milli> (diff).count()/1000;
-            if (verbose == 2) {
-              Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |",    \
-                      -Best_BK_Fitness,                                 \
-                      -Best_LS_Fitness,                                 \
-                      generation,                                       \
-                      bestGeneration,                                   \
-                      time_elapsed);
-              Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
-            }
+            // if (verbose == 2) {
+            //   Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |",    \
+            //           -Best_BK_Fitness,                                 \
+            //           -Best_LS_Fitness,                                 \
+            //           generation,                                       \
+            //           bestGeneration,                                   \
+            //           time_elapsed);
+            //   Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
+            // }
           } 
           if (time_elapsed > MAX_TIME) break; // Get out of here!
         }
-        double fitness = -Arma_getTourFitness(M, DistanceMatrix);
+        // double fitness = -Arma_getTourFitness(M, DistanceMatrix);
+        // if(fitness < Best_LS_Fitness){
+        //   Best_LS_Fitness = fitness;
+        //   BestTour = M;
+        // }
+        tours.col(k) = M;
+      }
+      // End of parallel loop
+      
+      for(unsigned k = 0; k < K; k++){
+        double fitness = -Arma_getTourFitness(tours.col(k), DistanceMatrix);
         if(fitness < Best_LS_Fitness){
           Best_LS_Fitness = fitness;
-          BestTour = M;
+          BestTour = tours.col(k);
         }
-        
       }
     }
+    
     
     
     if ((last_LS_fitness > Best_LS_Fitness) || (last_BK_fitness > Best_BK_Fitness)){
@@ -501,7 +524,7 @@ Rcpp::List mdp_brkga_uset(const arma::mat   DistanceMatrix,
       } 
     }
     
-    if (verbose) {
+    if (verbose == 2) {
       Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |",    \
               -Best_BK_Fitness,                                 \
               -Best_LS_Fitness,                                 \
@@ -512,6 +535,8 @@ Rcpp::List mdp_brkga_uset(const arma::mat   DistanceMatrix,
     }
     
     if ((generation % LS_INTVL == 0)){
+      std::list< std::unordered_set<unsigned> > tours;
+#pragma omp parallel for  schedule(static)
       for(unsigned k_ = 0; k_ < K; k_++){
         std::vector<double> chromosome = algorithm.getBestPopulationChromosome(k_);
         std::unordered_set< unsigned > M = get_M(chromosome, m);
@@ -537,24 +562,35 @@ Rcpp::List mdp_brkga_uset(const arma::mat   DistanceMatrix,
             diff = time - start;
             time_elapsed = std::chrono::duration <double, std::milli> (diff).count()/1000;
             if (time_elapsed > MAX_TIME) break; // Get out of here!
-            if (verbose == 2) {
-              Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |",    \
-                      -Best_BK_Fitness,                                 \
-                      -Best_LS_Fitness,                                 \
-                      generation,                                       \
-                      bestGeneration,                                   \
-                      time_elapsed);
-              Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
+            // if (verbose == 2) {
+            //   Rprintf("\r| %12.2f | %12.2f | %10i | %7i | %7.1fs |",    \
+            //           -Best_BK_Fitness,                                 \
+            //           -Best_LS_Fitness,                                 \
+            //           generation,                                       \
+            //           bestGeneration,                                   \
+            //           time_elapsed);
+            //   Rprintf("\n+--------------+--------------+------------+---------+----------+\r\b\r");
+            // }
+          }
+            tours.push_front(M);
+          }
+          
+          for(auto it = tours.begin(); it != tours.end(); it++){
+            double fitness = -getTourFitness(*it, DistanceMatrix);
+            if(fitness < Best_LS_Fitness){
+              Best_LS_Fitness = fitness;
+              BestTour = *it;
             }
-            
           }
-          double fitness = -getTourFitness(M, DistanceMatrix);
-          if(fitness < Best_LS_Fitness){
-            Best_LS_Fitness = fitness;
-            BestTour = M;
-          }
-      }
-    }
+      }            
+    //       }
+    //       double fitness = -getTourFitness(M, DistanceMatrix);
+    //       if(fitness < Best_LS_Fitness){
+    //         Best_LS_Fitness = fitness;
+    //         BestTour = M;
+    //       }
+    //   }
+    // }
     
     if ((last_LS_fitness > Best_LS_Fitness) || (last_BK_fitness > Best_BK_Fitness)){
       ImprovedSol++;
