@@ -202,6 +202,7 @@ rst <- brkga::mdp_brkgaArma(DistanceMatrix = dist_matrix,
                             rngSeed =  as.integer(Sys.time()))
 
 library(brkga)
+dist_matrix <- read_rds("inst/extdata/MDG.1.a.n500m50.rds")
 rst <- mdp_brkga(DistanceMatrix = dist_matrix, 
                  m = 50, 
                  LS_INTVL = 1, 

@@ -60,7 +60,7 @@ arma::vec Arma_getAlphaVector(const arma::uvec& Tour, const arma::mat& Distances
   for(unsigned i = 0; i < m; i++){
       alpha(Tour(i)) = 1.0;
   }
-  return(Distances*alpha);
+  return(Distances*alpha/2);
 }
 
 
@@ -386,7 +386,7 @@ arma::vec getAlphaVector(const std::unordered_set<unsigned>& Tour, const arma::m
     if (it != Tour.end())
       alpha(i) = 1.0;
   }
-  return(Distances*alpha);
+  return(Distances*alpha/2);
 }
 
 
