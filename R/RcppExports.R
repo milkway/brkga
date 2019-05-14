@@ -28,7 +28,7 @@ getAlphaVector <- function(Tour, Distances) {
     .Call(`_brkga_Arma_getAlphaVector`, Tour, Distances)
 }
 
-#' Get Binet tour
+#' Get Binary tour
 #' @details Get the binary representation of the tour
 #' @param \code{Tour} Set of nodes;
 #' @param \code{n} Number of nodes
@@ -106,6 +106,131 @@ mdp_brkga <- function(DistanceMatrix, m, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIM
 #' @export 
 mdp_brkga_uset <- function(DistanceMatrix, m, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 4L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L, verbose = 2L, rngSeed = 0L) {
     .Call(`_brkga_mdp_brkga_uset`, DistanceMatrix, m, LS_INTVL, GEN_INTVL, MAX_TIME, p, pe, pm, rhoe, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed)
+}
+
+#' Execute a MDP solution search using BRKGA
+#' @details Escrever um detalhamento bem legal e super bacana
+#'  aqui.
+#' @param \code{DistanceMatrix} distances matrix of the instance 
+#' @param \code{m} Number of elements selected (m <= n)
+#' @param \code{MAX_TIME}  Max time of execution in seconds
+#' @param \code{p}  Size of population
+#' @param \code{pe} Fraction of population to be the elite-set
+#' @param \code{pm} Fraction of population to be replaced by mutants
+#' @param \code{rhoe} Frobability that offspring inherit an allele from elite parent
+#' @param \code{lambda} probability update population with local search
+#' @param \code{K} number of independent populations
+#' @param \code{THREADS} number of threads for parallel decoding
+#' @param \code{X_INTVL} Exchange best individuals at every 100 generations
+#' @param \code{X_NUMBER} Exchange top 2 best
+#' @param \code{MAX_GENS} Max number of generations
+#' @param \code{verbose} Level of output information
+#' @param \code{rngSeed} Seed to the random number generator
+#' @return A numeric vector of random values
+#' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
+#' @export 
+mdp_brkgaContinueShuffle <- function(DistanceMatrix, m, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 4L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L, verbose = 2L, rngSeed = 0L) {
+    .Call(`_brkga_mdp_brkgaContinueShuffle`, DistanceMatrix, m, LS_INTVL, GEN_INTVL, MAX_TIME, p, pe, pm, rhoe, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed)
+}
+
+#' Execute a MDP solution search using BRKGA
+#' @details Escrever um detalhamento bem legal e super bacana
+#'  aqui.
+#' @param \code{DistanceMatrix} distances matrix of the instance 
+#' @param \code{m} Number of elements selected (m <= n)
+#' @param \code{MAX_TIME}  Max time of execution in seconds
+#' @param \code{p}  Size of population
+#' @param \code{pe} Fraction of population to be the elite-set
+#' @param \code{pm} Fraction of population to be replaced by mutants
+#' @param \code{rhoe} Frobability that offspring inherit an allele from elite parent
+#' @param \code{lambda} probability update population with local search
+#' @param \code{K} number of independent populations
+#' @param \code{THREADS} number of threads for parallel decoding
+#' @param \code{X_INTVL} Exchange best individuals at every 100 generations
+#' @param \code{X_NUMBER} Exchange top 2 best
+#' @param \code{MAX_GENS} Max number of generations
+#' @param \code{verbose} Level of output information
+#' @param \code{rngSeed} Seed to the random number generator
+#' @return A numeric vector of random values
+#' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
+#' @export 
+mdp_brkgaContinue <- function(DistanceMatrix, m, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 4L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L, verbose = 2L, rngSeed = 0L) {
+    .Call(`_brkga_mdp_brkgaContinue`, DistanceMatrix, m, LS_INTVL, GEN_INTVL, MAX_TIME, p, pe, pm, rhoe, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed)
+}
+
+#' Execute a MDP solution search using BRKGA
+#' @details Escrever um detalhamento bem legal e super bacana
+#'  aqui.
+#' @param \code{DistanceMatrix} distances matrix of the instance 
+#' @param \code{m} Number of elements selected (m <= n)
+#' @param \code{MAX_TIME}  Max time of execution in seconds
+#' @param \code{p}  Size of population
+#' @param \code{pe} Fraction of population to be the elite-set
+#' @param \code{pm} Fraction of population to be replaced by mutants
+#' @param \code{rhoe} Frobability that offspring inherit an allele from elite parent
+#' @param \code{lambda} probability update population with local search
+#' @param \code{K} number of independent populations
+#' @param \code{THREADS} number of threads for parallel decoding
+#' @param \code{X_INTVL} Exchange best individuals at every 100 generations
+#' @param \code{X_NUMBER} Exchange top 2 best
+#' @param \code{MAX_GENS} Max number of generations
+#' @param \code{verbose} Level of output information
+#' @param \code{rngSeed} Seed to the random number generator
+#' @return A numeric vector of random values
+#' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
+#' @export 
+mdp_brkgaBackShuffle <- function(DistanceMatrix, m, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 4L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L, verbose = 2L, rngSeed = 0L) {
+    .Call(`_brkga_mdp_brkgaBackShuffle`, DistanceMatrix, m, LS_INTVL, GEN_INTVL, MAX_TIME, p, pe, pm, rhoe, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed)
+}
+
+#' Execute a MDP solution search using BRKGA
+#' @details Escrever um detalhamento bem legal e super bacana
+#'  aqui.
+#' @param \code{DistanceMatrix} distances matrix of the instance 
+#' @param \code{m} Number of elements selected (m <= n)
+#' @param \code{MAX_TIME}  Max time of execution in seconds
+#' @param \code{p}  Size of population
+#' @param \code{pe} Fraction of population to be the elite-set
+#' @param \code{pm} Fraction of population to be replaced by mutants
+#' @param \code{rhoe} Frobability that offspring inherit an allele from elite parent
+#' @param \code{lambda} probability update population with local search
+#' @param \code{K} number of independent populations
+#' @param \code{THREADS} number of threads for parallel decoding
+#' @param \code{X_INTVL} Exchange best individuals at every 100 generations
+#' @param \code{X_NUMBER} Exchange top 2 best
+#' @param \code{MAX_GENS} Max number of generations
+#' @param \code{verbose} Level of output information
+#' @param \code{rngSeed} Seed to the random number generator
+#' @return A numeric vector of random values
+#' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
+#' @export 
+mdp_brkgaBack <- function(DistanceMatrix, m, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 4L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L, verbose = 2L, rngSeed = 0L) {
+    .Call(`_brkga_mdp_brkgaBack`, DistanceMatrix, m, LS_INTVL, GEN_INTVL, MAX_TIME, p, pe, pm, rhoe, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed)
+}
+
+#' Execute a MDP solution search using BRKGA
+#' @details Escrever um detalhamento bem legal e super bacana
+#'  aqui.
+#' @param \code{DistanceMatrix} distances matrix of the instance 
+#' @param \code{m} Number of elements selected (m <= n)
+#' @param \code{MAX_TIME}  Max time of execution in seconds
+#' @param \code{p}  Size of population
+#' @param \code{pe} Fraction of population to be the elite-set
+#' @param \code{pm} Fraction of population to be replaced by mutants
+#' @param \code{rhoe} Frobability that offspring inherit an allele from elite parent
+#' @param \code{lambda} probability update population with local search
+#' @param \code{K} number of independent populations
+#' @param \code{THREADS} number of threads for parallel decoding
+#' @param \code{X_INTVL} Exchange best individuals at every 100 generations
+#' @param \code{X_NUMBER} Exchange top 2 best
+#' @param \code{MAX_GENS} Max number of generations
+#' @param \code{verbose} Level of output information
+#' @param \code{rngSeed} Seed to the random number generator
+#' @return A numeric vector of random values
+#' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
+#' @export 
+mdp_brkgaRandom <- function(DistanceMatrix, m, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 4L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 100L, RESET_AFTER = 200L, verbose = 2L, rngSeed = 0L) {
+    .Call(`_brkga_mdp_brkgaRandom`, DistanceMatrix, m, LS_INTVL, GEN_INTVL, MAX_TIME, p, pe, pm, rhoe, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed)
 }
 
 #' Execute a MDP solution search using BRKGA
