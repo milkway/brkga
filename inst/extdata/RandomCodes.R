@@ -202,15 +202,15 @@ rst <- brkga::mdp_brkgaArma(DistanceMatrix = dist_matrix,
                             rngSeed =  as.integer(Sys.time()))
 
 library(brkga)
-dist_matrix <- read_rds("inst/extdata/MDG.1.a.n500m50.rds")
-rst <- mdp_brkgaContinueShuffle(DistanceMatrix = dist_matrix, 
+dist_matrix <- read_rds("inst/extdata/MDG.16.b.n500m50.rds")
+rst <- mdp_brkgaPathRelink(DistanceMatrix = dist_matrix, 
                  m = 50, 
                  LS_INTVL = 1, 
                  K = 8,
                  GEN_INTVL = 1, 
-                 MAX_TIME = 10, 
-                 MAX_GENS = 1000, 
-                 RESET_AFTER = 10, 
+                 MAX_TIME = 100, 
+                 MAX_GENS = 500, 
+                 RESET_AFTER = 20, 
                  rngSeed = as.integer(Sys.time()), 
                  THREADS = 8, verbose = 2)
 
@@ -224,3 +224,17 @@ rst <- mdp_brkga_uset(DistanceMatrix = dist_matrix,
                  RESET_AFTER = 10, 
                  rngSeed = as.integer(Sys.time()), 
                  THREADS = 8, verbose = 2)
+
+
+
+dist_matrix <- read_rds("inst/extdata/MDG.1.a.n500m50.rds")
+rst <- mdp_brkgaPathRelink(DistanceMatrix = dist_matrix, 
+                                m = 50, 
+                                LS_INTVL = 1, 
+                                K = 8,
+                                GEN_INTVL = 1, 
+                                MAX_TIME = 10, 
+                                MAX_GENS = 1000, 
+                                RESET_AFTER = 10, 
+                                rngSeed = as.integer(Sys.time()), 
+                                THREADS = 8, verbose = 2)
