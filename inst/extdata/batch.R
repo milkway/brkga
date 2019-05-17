@@ -1,4 +1,4 @@
-library(brkga)
+suppressPackageStartupMessages(library(brkga))
 
 lista <- read_rds(system.file("extdata", package = "brkga",  "mdplib.rds")) %>% 
   mutate(Name = paste0("conv_", Instance), 
@@ -76,9 +76,9 @@ for (k in 1:nrow(lista)){#
       #     #geom_hline(yintercept = median(resultado$BKEr), color = "#F8766D", alpha = .25, size = 1) + 
       #     ylim(min(min(resultado$BKEr),min(resultado$LSEr)) - .1, max(max(resultado$BKEr),max(resultado$LSEr)) + .1)
       # )
+      write_rds(resultado, path = "~/data/brkga.rds")
     }
     rm(i, rst, seed, bestValue, dist_matrix, InstName, m)
-    write_rds(resultado, path = "~/data/brkga.rds")
   }
 
 cat("\nThis is the end. The Doors.")
