@@ -238,3 +238,53 @@ rst <- mdp_brkgaPathRelink(DistanceMatrix = dist_matrix,
                                 RESET_AFTER = 10, 
                                 rngSeed = as.integer(Sys.time()), 
                                 THREADS = 8, verbose = 2)
+
+
+###############################################################################
+
+
+library(brkga)
+
+dm <- read_rds("inst/extdata/MDG.16.b.n500m50.rds")
+tour <- tibble(N = 1:nrow(dm), Distance = rowSums(dm)) %>% top_n(50, Distance) %>% select(N) %>% unlist(use.names = FALSE)
+nontour <- setdiff(1:500, tour)
+getTourFitness(tour-1, dm)
+#####
+S <- dm[c(tour, nontour), c(tour, nontour)] 
+G <- S %*% matrix(c(rep(1,50), rep(0,450)), ncol = 1)
+IM <- S[tour, nontour]
+IM1 <- apply(IM, 2, function(x){-x - G[1:50]})
+IM2 <- apply(IM1, 1, function(x){x + G[51:500]})
+
+gtz <- as_tibble(which(IM2 >= 0, arr.ind = TRUE)) %>% 
+  mutate(delta = apply(., 1, function(x) {IM2[x[1], x[2]]}))
+OutIn <- gtz %>% top_n(1, delta)
+OutIn
+
+aux <- tour[OutIn$col]
+tour[OutIn$col] <- nontour[OutIn$row]
+nontour[OutIn$row] <- aux
+
+getTourFitness(tour-1, dm)
+
+
+#####
+S0 <- dm[c(tour, nontour), c(tour, nontour)] 
+G0 <- S0%*% matrix(c(rep(1,50), rep(0,450)), ncol = 1)
+Out <- which.min(G0[1:50])
+In <- which.max(G0[51:500])
+aux <- tour[Out]
+tour[Out] <- nontour[In]
+nontour[In] <- aux
+getTourFitness(tour-1, dm)
+
+S1 <- dm[c(tour, nontour), c(tour, nontour)] 
+G1 <- S1%*% matrix(c(rep(1,50), rep(0,450)), ncol = 1)
+Out <- which.min(G1[1:50])
+In <- which.max(G1[51:500])
+aux <- tour[Out]
+tour[Out] <- nontour[In]
+nontour[In] <- aux
+getTourFitness(tour-1, dm)
+
+
