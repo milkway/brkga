@@ -228,14 +228,14 @@ rst <- mdp_brkga_uset(DistanceMatrix = dist_matrix,
 
 
 dist_matrix <- read_rds("inst/extdata/MDG.1.a.n500m50.rds")
-rst <- mdp_brkgaPathRelink(DistanceMatrix = dist_matrix, 
+rst <- mdp_brkga(DistanceMatrix = dist_matrix, 
                                 m = 50, 
                                 LS_INTVL = 1, 
                                 K = 8,
-                                GEN_INTVL = 1, 
-                                MAX_TIME = 10, 
+                                GEN_INTVL = 20, 
+                                MAX_TIME = 30, 
                                 MAX_GENS = 1000, 
-                                RESET_AFTER = 10, 
+                                RESET_AFTER = 100, 
                                 rngSeed = as.integer(Sys.time()), 
                                 THREADS = 8, verbose = 2)
 
