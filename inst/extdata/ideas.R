@@ -218,7 +218,7 @@ distM <- distances[c(tour, nontour), c(tour, nontour)]
 
 cat("Fitness: ", sum(distM[1:M, 1:M])/2)
 
-for (j in 1:5000){
+for (j in 1:100){
   G <- distM %*% v
   R <- distM[1:M, (M+1):N] %>% 
     apply(2, function(x){-x - G[1:M]}) %>% 
@@ -247,3 +247,68 @@ for (j in 1:5000){
   
 }
 
+######
+library(tidyverse)
+N <- 2000
+M <- 200
+distances <- read_rds("inst/extdata/MDG.21.a.n2000m200.rds")
+
+distances.d <- as.dist(distances)
+cluster.mdp <- hclust(distances.d, method = "ward.D2")
+tour <- 
+  tibble(
+    N = 1:N,
+    Cluster = cutree(cluster.mdp, M) 
+  ) %>% 
+  group_by(Cluster) %>% 
+  sample_n(1) %>% ungroup() %>% select(N) %>% unlist(use.names = FALSE) 
+
+nontour <- setdiff(1:N, tour)
+
+
+v <- matrix(c(rep(1,M), rep(0,N-M)), ncol = 1) 
+
+
+distM <- distances[c(tour, nontour), c(tour, nontour)]
+
+cat("Fitness: ", sum(distM[1:M, 1:M])/2)
+
+start_ <- Sys.time()
+end_ <- Sys.time()
+MAX_TIME <- 60
+Fitness <- 0
+while((end_ - start_ ) <= MAX_TIME){
+  G <- distM %*% v
+  R <- distM[1:M, (M+1):N] %>% 
+    apply(2, function(x){-x - G[1:M]}) %>% 
+    apply(1, function(x){x + G[(M+1):N]}) %>% t
+  
+  gtz <- as_tibble(which(R >= 0, arr.ind = TRUE)) %>% 
+    mutate(delta = apply(., 1, function(x) {R[x[1], x[2]]}),
+           prob = exp(delta/1000)) #+1 to allow zero delta a change
+  
+  if (nrow(gtz) != 0) {
+    OutIn <- gtz %>% sample_n(1, weight = prob)
+    aux <- tour[OutIn$row]
+    tour[OutIn$row] <- nontour[OutIn$col]
+    nontour[OutIn$col] <- aux
+  } 
+  else{
+    out_ <- sample(1:M,20)
+    in_ <- sample(1:(N-M),20)
+    aux <- tour[out_]
+    tour[out_] <- nontour[in_]
+    nontour[in_] <- aux
+  }
+  
+  
+  distM <- distances[c(tour, nontour), c(tour, nontour)]
+  
+  val <- round(sum(distM[1:M, 1:M])/2, 1)
+  if (val >= Fitness) 
+    Fitness <- val 
+  cat("\nFitness: ", val, "Best: ", Fitness, " Delta: ", OutIn$delta)
+  end_ <- Sys.time()
+}
+cat("\nBest Fitness: ", Fitness)
+print(end_ - start_)
