@@ -94,8 +94,12 @@ lista <- read_rds(system.file("extdata", package = "brkga",  "mdplib.rds")) %>%
          m = as.integer(str_remove(str_extract(Name,pattern = "m\\d+"), pattern = "m"))) %>% 
   filter(Type == "MDG", SubType == "a")
 
-index = 3
+index = 1
 dist_matrix <- read_rds(system.file("extdata", package = "brkga",  paste0(lista$Type[index], ".", index, ".", lista$SubType[index], ".n", lista$n[index], "m", lista$m[index])))
+
+dist_matrix <- read_rds(paste0("inst/extdata/",lista$Type[index], ".", index, ".", lista$SubType[index], ".n", lista$n[index], "m", lista$m[index], ".rds"))
+
+dim(dist_matrix)
 
 res <- brkga::mdp_brkga(DistanceMatrix = dist_matrix,
                         m = lista$m[index],
@@ -104,8 +108,8 @@ res <- brkga::mdp_brkga(DistanceMatrix = dist_matrix,
                         pe = .2, 
                         pm = .2,
                         rhoe = .75,
-                        MAXT=8, 
                         K=3, 
                         MAX_GENS = 1500,
-                        RESET_AFTER = 200, 
+                        RESET_AFTER = 200,
+                        verbose =  TRUE,
                         rngSeed = 265)

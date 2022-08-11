@@ -11,6 +11,35 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// calado_brkgaArma
+Rcpp::List calado_brkgaArma(const std::vector<double> DistanceVector, const std::vector<double> DemandVector, const std::vector<double> DraftVector, const unsigned N, const unsigned LS_INTVL, const unsigned GEN_INTVL, const unsigned MAX_TIME, const unsigned p, const double pe, const double pm, const double rhoe, const unsigned K, const unsigned THREADS, const unsigned X_INTVL, const unsigned X_NUMBER, const unsigned MAX_GENS, const unsigned RESET_AFTER, const unsigned verbose, long unsigned rngSeed);
+RcppExport SEXP _brkga_calado_brkgaArma(SEXP DistanceVectorSEXP, SEXP DemandVectorSEXP, SEXP DraftVectorSEXP, SEXP NSEXP, SEXP LS_INTVLSEXP, SEXP GEN_INTVLSEXP, SEXP MAX_TIMESEXP, SEXP pSEXP, SEXP peSEXP, SEXP pmSEXP, SEXP rhoeSEXP, SEXP KSEXP, SEXP THREADSSEXP, SEXP X_INTVLSEXP, SEXP X_NUMBERSEXP, SEXP MAX_GENSSEXP, SEXP RESET_AFTERSEXP, SEXP verboseSEXP, SEXP rngSeedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<double> >::type DistanceVector(DistanceVectorSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double> >::type DemandVector(DemandVectorSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double> >::type DraftVector(DraftVectorSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type N(NSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type LS_INTVL(LS_INTVLSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type GEN_INTVL(GEN_INTVLSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type MAX_TIME(MAX_TIMESEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type p(pSEXP);
+    Rcpp::traits::input_parameter< const double >::type pe(peSEXP);
+    Rcpp::traits::input_parameter< const double >::type pm(pmSEXP);
+    Rcpp::traits::input_parameter< const double >::type rhoe(rhoeSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type K(KSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type THREADS(THREADSSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type X_INTVL(X_INTVLSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type X_NUMBER(X_NUMBERSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type MAX_GENS(MAX_GENSSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type RESET_AFTER(RESET_AFTERSEXP);
+    Rcpp::traits::input_parameter< const unsigned >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< long unsigned >::type rngSeed(rngSeedSEXP);
+    rcpp_result_gen = Rcpp::wrap(calado_brkgaArma(DistanceVector, DemandVector, DraftVector, N, LS_INTVL, GEN_INTVL, MAX_TIME, p, pe, pm, rhoe, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed));
+    return rcpp_result_gen;
+END_RCPP
+}
 // Arma_get_M
 arma::uvec Arma_get_M(const arma::vec& chromosome, unsigned m);
 RcppExport SEXP _brkga_Arma_get_M(SEXP chromosomeSEXP, SEXP mSEXP) {
@@ -889,6 +918,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_brkga_calado_brkgaArma", (DL_FUNC) &_brkga_calado_brkgaArma, 19},
     {"_brkga_Arma_get_M", (DL_FUNC) &_brkga_Arma_get_M, 2},
     {"_brkga_Arma_get_N", (DL_FUNC) &_brkga_Arma_get_N, 2},
     {"_brkga_Arma_getAlphaVector", (DL_FUNC) &_brkga_Arma_getAlphaVector, 2},
