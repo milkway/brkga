@@ -2,6 +2,7 @@
 /home/leite/Github/old/brkga/R/nonlinear_lib.R="62920129"
 /home/leite/Github/old/brkga/inst/extdata/RandomCodes.R="5E69B078"
 /home/leite/Github/old/brkga/inst/extdata/RandomCodes2.R="2085EDF6"
+/home/leite/Github/old/brkga/inst/extdata/RandomCodesDraft.R="D387EEC6"
 /home/leite/Github/old/brkga/inst/extdata/batch2.R="D9EB7CFA"
 /home/leite/Github/old/brkga/inst/extdata/ideas.R="9E28A6AF"
 /home/leite/Github/old/brkga/src/TSPInstance.cpp="E7DB3F70"
@@ -10,3 +11,4 @@
 /home/leite/Github/old/brkga/src/mdp_brkga.cpp="D7CFB6BA"
 /home/leite/Github/old/brkga/src/nlDecoder.cpp="83E0B9E7"
 /home/leite/Github/old/brkga/src/nlDecoder.h="4E3FBB82"
+/home/leite/Github/old/brkga/src/reg_brkga.cpp="689862C0"
