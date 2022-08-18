@@ -41,12 +41,16 @@ tabela %>% select(-path, -raw, -comment, -filename)
 write_rds(tabela, file = "inst/extdata/TSPDL_RAW.rds")
 write_rds(tabela %>% select(-path, -raw, -comment, -filename), file = "inst/extdata/TSPDL_DATA.rds")
 
+
+library(tidyverse)
+library(brkga)
+
 tspdl_data <-read_rds("inst/extdata/TSPDL_DATA.rds")
+##tspdl_raw <-read_rds("inst/extdata/TSPDL_RAW.rds")
 
-tabela
-apply(matrix(tabela$path, ncol = 1), 1L, function (x) length(read_file(x)))
-
-list(draft = as.integer(unlist(tspdl_data$draft[1])))
+#tabela
+#apply(matrix(tabela$path, ncol = 1), 1L, function (x) length(read_file(x)))
+#list(draft = as.integer(unlist(tspdl_data$draft[1])))
 
 index <- 1
 distance <- tspdl_data[index,]$distance %>% unlist

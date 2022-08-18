@@ -37,7 +37,7 @@
 //' @return A numeric vector of random values
 //' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
 //' @export 
-// [[Rcpp::export(" calado_brkga")]]
+// [[Rcpp::export("calado_brkga")]]
 Rcpp::List calado_brkgaArma(const std::vector<double>    DistanceVector,  
                          const std::vector<double>    DemandVector,  
                          const std::vector<double>    DraftVector,  
@@ -84,14 +84,6 @@ Rcpp::List calado_brkgaArma(const std::vector<double>    DistanceVector,
 
 	//const long unsigned rngSeed = time(0);	// seed to the random number generator
 	MTRand rng(rngSeed);					// initialize the random number generator
-
-	// const unsigned n = instance.num_nodes;		// size of chromosomes
-	// const unsigned p = 256;		// size of population
-	// const double pe = 0.10;		// fraction of population to be the elite-set
-	// const double pm = 0.10;		// fraction of population to be replaced by mutants
-	// const double rhoe = 0.70;	// probability that offspring inherit an allele from elite parent
-	// const unsigned K = 3;		// number of independent populations
-	// const unsigned MAX_TIME = 2;	// number of threads for parallel decoding
 
 	// initialize the BRKGA-based heuristic
 	BRKGA< caladoDecoder, MTRand > algorithm(N, p, pe, pm, rhoe, decoder, rng, K, MAX_TIME);

@@ -24,7 +24,7 @@
 #' @return A numeric vector of random values
 #' @seealso \code{\link{api-usage}} and \url{https://github.com/milkway/brkga}
 #' @export 
- calado_brkga <- function(DistanceVector, DemandVector, DraftVector, N, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 4L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 1000L, RESET_AFTER = 200L, verbose = 2L, rngSeed = 0L) {
+calado_brkga <- function(DistanceVector, DemandVector, DraftVector, N, LS_INTVL = 10L, GEN_INTVL = 5L, MAX_TIME = 10L, p = 500L, pe = 0.20, pm = 0.10, rhoe = 0.70, K = 4L, THREADS = 8L, X_INTVL = 100L, X_NUMBER = 2L, MAX_GENS = 1000L, RESET_AFTER = 200L, verbose = 2L, rngSeed = 0L) {
     .Call(`_brkga_calado_brkgaArma`, DistanceVector, DemandVector, DraftVector, N, LS_INTVL, GEN_INTVL, MAX_TIME, p, pe, pm, rhoe, K, THREADS, X_INTVL, X_NUMBER, MAX_GENS, RESET_AFTER, verbose, rngSeed)
 }
 
