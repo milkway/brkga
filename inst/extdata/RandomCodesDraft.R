@@ -64,4 +64,57 @@ rst <- calado_brkga(DistanceVector = distance,
              N = N, 
              rngSeed = 0)
 rst
+table(rst$Tour)
+
+
+
+sol_check <- function(rst, N, draft, demand, distance){
+  if (sum((table(rst$Tour) == 1) == FALSE) > 0){
+    cat("\nErro: Tour passa mais de uma vez por algum porto.")
+    return(list(Contition = 'Erro!'))
+  } 
+  if (length(rst$Tour) != N) {
+    cat("\nErro: Tour não passa por todos o nós, falta ", N - length(rst$Tour), "portos.")
+    return(list(Contition = 'Erro!'))
+  }
+    
+  if (rst$Tour[1] != 0) {
+    cat("\nErro: Tour não inicia no porto 0")
+    return(list(Contition = 'Erro!'))
+  }
+  
+  mat_distance <- matrix(distance, nrow = N, ncol = N)
+  
+  dados <- tibble(N = 0:(N-1), Demand = demand, Draft = draft)
+  
+  table_tour <- tibble(Order = 1:length(rst$Tour), 
+         Tour = rst$Tour) %>% 
+    mutate(Next = lead(Tour, default = 0),
+           #Distance = mat_distance[Tour, Next]
+    ) %>% 
+    group_by(Order, Tour, Next) %>% 
+    summarise(Distance = mat_distance[Tour + 1,Next + 1], .groups = "drop") %>% 
+    left_join(dados, by = c("Tour" = "N")) %>% 
+    mutate(Demand_Cum = cumsum(Demand), Load = sum(dados$Demand) - Demand_Cum,
+           Condition = if_else(Load <= Draft, "Success", "Fail")) 
+  
+  if (sum(table_tour$Condition == 'Fail') > 0) {
+    cat("\nErro: Calado não atendido em alguma porto.")
+    return(list(Contition = 'Erro!', table = table_tour))
+  }
+  
+  if (sum(table_tour$Distance) != rst$BKFitness) {
+    cat("\nErro: Fitness do tour não bate com resultado.")
+    return(list(Contition = 'Erro!', table = table_tour))
+  }
+  
+  return(list(Contition = 'Solução viável!', table = table_tour))
+}
+
+sol_check(rst = rst, N = N, draft = draft, demand = demand, distance = distance)
+
+
+
+sol[1] <- 0
+sol[6] <- 24
 
